@@ -1,0 +1,8 @@
+﻿http://localhost/beton_new/index.php?c=Widget_Controller&f=get_plant_load&v=ViewBeton&token=56829f68f0128:c8659f1edc289225baab93bd6f77e677&cond_fields=date_time,date_time&cond_vals=29/12/2015%2007:00:00,30/12/2015%2006:59:59&cond_sgns=ge,le
+
+
+c=Widget_Controller
+f=get_plant_load
+cond_fields=date_time,date_time
+cond_vals=29/12/2015 07:00:00,30/12/2015 06:59:59
+cond_sgns=ge,le

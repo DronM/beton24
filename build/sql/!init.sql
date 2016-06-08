@@ -1,0 +1,2 @@
+INSERT INTO email_templates (email_type,template,mes_subject,comment_text,fields) VALUES ('reset_pwd','Пользователю [name] изменен пароль. Новый пароль [pwd]','Новый пароль','',array['name','pwd']);
+INSERT INTO email_templates (email_type,template,mes_subject,comment_text,fields) VALUES ('new_account','Создана новая учетная запись [name]. Логин: [name] пароль: [pwd]','Новая учетная запись','',array['name','pwd']);

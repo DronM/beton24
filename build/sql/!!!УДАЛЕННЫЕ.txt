@@ -1,0 +1,23 @@
+DROP VIEW vehicle_schedule_complete_view;
+DROP VIEW vehicle_schedule_list_view;
+DROP VIEW lab_cur_vehicle_list;
+
+
+DROP VIEW broken_trackers_list_view;
+DROP VIEW vehicle_current_pos_all;
+DROP VIEW vehicle_dialog_view;
+DROP VIEW car_tracking_malfunctions;
+
+
+DROP VIEW shipment_time_list;
+DROP VIEW shipment_list_view;
+DROP VIEW shipment_for_order_list_view;
+DROP VIEW shipment_dialog_view;
+DROP VIEW ra_material_consumption_list_view;
+DROP VIEW lab_entry_detail_list_view;
+DROP VIEW lab_entry_list_view;
+DROP VIEW lab_data_list_view;
+
+DROP VIEW shipments_pumps_list ;
+DROP VIEW shipment_report  ;
+DROP VIEW shipment_date_list   ;

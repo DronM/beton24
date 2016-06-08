@@ -1,0 +1,3613 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata owner="beton24" descr="Бетон24">
+	<versions>
+		<version dateOpen="2015-05-01">2.0.100</version>
+		<lastBuild>2016-05-26 16:09:46</lastBuild>
+	</versions>
+	<enums>
+		<enum id="role_types">
+			<value id="owner" descr="Администратор"/>
+			<value id="boss" descr="Руководитель"/>
+			<value id="operator" descr="Оператор"/>
+			<value id="manager" descr="Менеджер"/>
+			<value id="dispatcher" descr="Диспетчер"/>
+			<value id="accountant" descr="Бухгалтер"/>
+			<value id="lab_worker" descr="Лаборант"/>
+			<value id="supplies" descr="Снабжение"/>
+			<value id="sales" descr="Реализация"/>
+			<value id="plant_director" descr="Нач.базы"/>
+			<value id="supervisor" descr="Смотрящий"/>
+		</enum>
+		<enum id="unload_types">
+			<value id="pump" descr="насос"/>
+			<value id="band" descr="лента"/>
+			<value id="none" descr="нет"/>
+		</enum>
+		<enum id="vehicle_states">
+			<value id="shift" descr="смена"/>
+			<value id="free" descr="на базе"/>
+			<value id="assigned" descr="назначен"/>
+			<value id="busy" descr="отгружен"/>
+			<value id="left_for_dest" descr="выехал к клиенту"/>
+			<value id="at_dest" descr="у клиента"/>
+			<value id="left_for_base" descr="возвращается на базу"/>
+			<value id="out_from_shift" descr="уехал со смены"/>
+			<value id="out" descr="уехал"/>
+		</enum>
+		<enum id="periods">
+			<value id="day" descr="День"/>
+			<value id="week" descr="Неделя"/>
+			<value id="month" descr="Месяц"/>
+			<value id="quarter" descr="Квартал"/>
+			<value id="year" descr="Год"/>
+		</enum>						
+		<enum id="contact_types">
+			<value id="tel" descr="Телефон"/>
+			<value id="email" descr="Эл.почта"/>
+		</enum>						
+		
+		<!-- -->
+		<enum id="sms_types">
+			<value id="order" descr="заявка"/>
+			<value id="ship" descr="отгрузка"/>
+			<value id="remind" descr="напоминание"/>
+			<value id="procur" descr="поставка"/>
+			<value id="order_for_pump_ins" descr="заявка для насоса (новая)"/>
+			<value id="order_for_pump_upd" descr="заявка для насоса (изменена)"/>
+			<value id="order_for_pump_del" descr="заявка для насоса (удалена)"/>
+			<value id="remind_for_pump" descr="напоминание для насоса"/>
+		</enum>
+		<enum id="email_types">
+			<value id="new_account" descr="Новая учетная запись"/>
+			<value id="reset_pwd" descr="Сброс пароля пользователя"/>
+		</enum>		
+		<enum id="doc_types">
+			<value id="material_procurement" descr="Поступление материалов"/>
+			<value id="shipment" descr="Отгрузка"/>
+		</enum>
+		<enum id="reg_types">
+			<value id="material" descr="Учет материалов"/>
+			<value id="material_consumption" descr="Расход материалов"/>			
+		</enum>		
+		<enum id="call_types">
+			<value id="in" descr="Входящий"/>
+			<value id="out" descr="Исходящий"/>			
+		</enum>				
+		<enum id="client_kinds">
+			<value id="buyer" descr="Клиент"/>
+			<value id="acc" descr="Бухгалтерия"/>
+			<value id="else" descr="Прочие"/>
+		</enum>						
+		<enum id="order_events">
+			<value id="insert" descr="Добавление"/>
+			<value id="update" descr="Изменение"/>
+			<value id="set_temp" descr="В черновик"/>
+			<value id="unset_temp" descr="Из черновика"/>
+		</enum>						
+		
+	</enums>
+	<models>
+		<model id="ConstantList" parent="ModelSQL" dataTable="constants_list_view" virtual="TRUE">
+			<defaultOrder>
+				<field id="id"/>
+			</defaultOrder>
+			<field id="id" dataType="String" primaryKey="TRUE" autoInc="FALSE" required="TRUE" length="50"/>
+			<field id="name" dataType="Text" required="TRUE"/>
+			<field id="descr" dataType="Text" required="TRUE"/>
+			<field id="val" dataType="Text" required="TRUE"/>
+		</model>
+		
+		<model id="TimeZoneLocale" parent="ModelSQL" dataTable="time_zone_locales" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" required="TRUE"/>
+			<field id="descr" dataType="String" required="TRUE" length="100"/>
+			<field id="name" dataType="String" required="TRUE" length="50"/>
+			<field id="hour_dif" dataType="Int" required="TRUE"/>
+		</model>
+		
+		<model id="User" parent="ModelSQL" dataTable="users" virtual="FALSE">
+			<defaultOrder>
+				<field id="name"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE"/>
+			<field id="name" dataType="String" required="TRUE" length="50" unique="TRUE" display="TRUE"/>
+			<field id="role_id" dataType="Enum" enumId="role_types" required="TRUE"/>
+			<field id="email" dataType="String" required="FALSE" length="50"/>
+			<field id="pwd" dataType="Password" length="32"/>
+			<field id="tel_ext" dataType="String" length="5"/>
+			<field id="phone_cel" dataType="String" length="15"/>
+			<field id="time_zone_locale_id" dataType="Int" refTable="time_zone_locales" refField="id"/>
+			<index id="users_name_index">
+				<field id="name" unique="TRUE"/>
+			</index>			
+		</model>
+		<model id="UserList" parent="ModelSQL" dataTable="user_list_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="name" dataType="String"/>
+			<field id="role_descr" dataType="String"/>
+			<field id="ext_num" dataType="String"/>
+		</model>
+		<model id="UserDialog" parent="ModelSQL" dataTable="user_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="name" dataType="String" alias="Имя"/>
+			<field id="email" dataType="String" alias="Эл.почта"/>
+			<field id="role_descr" dataType="String"/>
+			<field id="role_id" dataType="String"/>
+			<field id="phone_cel" dataType="String"/>
+		</model>
+		<model id="Contact" parent="ModelSQL" dataTable="contacts" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
+			<field id="first_name" dataType="String" length="50" required="TRUE"/>
+			<field id="middle_name" dataType="String" length="50"/>
+			<field id="last_name" dataType="String" length="50"/>
+			<field id="post" dataType="String" length="100"/>
+			<field id="description" dataType="Text"/>
+			<index id="contacts_name_idx">
+				<expression>(lower(last_name) || ' ' || lower(first_name))</expression>
+			</index>			
+		</model>
+		<model id="ContactList" parent="ModelSQL" dataTable="contacts_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="first_name" dataType="String"/>
+			<field id="middle_name" dataType="String"/>
+			<field id="last_name" dataType="String"/>
+			<field id="post" dataType="String"/>
+			<field id="description" dataType="Text"/>
+			<field id="tel_name" dataType="String"/>
+			<field id="tel_value" dataType="String"/>
+			<field id="email_name" dataType="String"/>
+			<field id="email_value" dataType="String"/>			
+		</model>		
+		<model id="ContactWithDetailsList" parent="ModelSQL" dataTable="contact_with_details_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="first_name" dataType="String"/>
+			<field id="middle_name" dataType="String"/>
+			<field id="last_name" dataType="String"/>
+			<field id="post" dataType="String"/>
+			<field id="description" dataType="Text"/>
+			<field id="main" dataType="String"/>
+			<field id="contact_detail_name" dataType="String"/>
+			<field id="contact_detail_value" dataType="String"/>
+			<field id="contact_detail_type" dataType="String"/>			
+		</model>		
+		
+		<model id="ContactDetail" parent="ModelSQL" dataTable="contact_details" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
+			<field id="contact_type" dataType="String" length="50"/>
+			<field id="name" dataType="String" length="100"/>
+			<field id="value" dataType="String" length="100"/>
+			<index id="contact_details_contact_type_idx">
+				<field id="contact_type"/>
+			</index>			
+			<index id="contact_details_value_idx">
+				<field id="value"/>
+			</index>						
+		</model>
+		
+		<model id="ClientContact" parent="ModelSQL" dataTable="client_contacts" virtual="FALSE">
+			<field id="client_id" dataType="Int" refTable="clients" refField="id" primaryKey="TRUE"/>
+			<field id="contact_id" dataType="Int" refTable="contacts" refField="id" primaryKey="TRUE"/>
+			<field id="main" dataType="Bool" defaultValue="FALSE"/>
+		</model>
+		<model id="ClientContactDetail" parent="ModelSQL" dataTable="client_contact_details" virtual="FALSE">
+			<field id="client_id" dataType="Int" refTable="clients" refField="id" primaryKey="TRUE"/>
+			<field id="contact_detail_id" dataType="Int" refTable="contact_details" refField="id" primaryKey="TRUE"/>
+			<field id="main" dataType="Bool" defaultValue="FALSE"/>
+		</model>
+		<model id="ClientContactDetailList" parent="ModelSQL" dataTable="client_contact_details_list" virtual="TRUE">
+			<field id="client_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="contact_detail_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="main" dataType="String"/>
+			<field id="contact_detail_type" dataType="String"/>
+			<field id="contact_detail_name" dataType="String"/>
+			<field id="contact_detail_value" dataType="String"/>
+		</model>		
+		
+		<model id="ContactContactDetail" parent="ModelSQL" dataTable="contact_contact_details" virtual="FALSE">
+			<field id="contact_id" dataType="Int" refTable="contacts" refField="id" primaryKey="TRUE"/>
+			<field id="contact_detail_id" dataType="Int" refTable="contact_details" refField="id" primaryKey="TRUE"/>
+			<field id="main" dataType="Bool" defaultValue="FALSE"/>
+		</model>
+		<model id="ContactContactDetailList" parent="ModelSQL" dataTable="contact_contact_details_list" virtual="TRUE">
+			<field id="contact_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="contact_detail_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="main" dataType="String"/>
+			<field id="contact_detail_type" dataType="String"/>
+			<field id="contact_detail_name" dataType="String"/>
+			<field id="contact_detail_value" dataType="String"/>
+		</model>
+		
+		<model id="ClientContactList" parent="ModelSQL" dataTable="client_contacts_list" virtual="TRUE">
+			<field id="client_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="contact_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="first_name" dataType="String"/>
+			<field id="last_name" dataType="String"/>
+			<field id="middle_name" dataType="String"/>
+			<field id="name" dataType="String"/>
+			<field id="post" dataType="String"/>
+			<field id="description" dataType="Text"/>			
+		</model>
+		
+		<model id="ContactComplete" parent="ModelSQL" dataTable="contacts_complete" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="name" dataType="String"/>
+			<field id="post" dataType="String" length="100"/>
+		</model>
+		<model id="Bank" parent="ModelSQL" dataTable="banks" virtual="FALSE">
+			<defaultOrder>
+				<field id="name"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="bik" dataType="String" length="9" alias="БИК"/>
+			<field id="name" dataType="String" required="TRUE" length="100" alias="Наименование"/>
+			<field id="account" dataType="String" length="20" alias="Кор.счет"/>
+			<index id="banks_name_idx">
+				<expression>lower(name)</expression>
+			</index>			
+			<index id="banks_bik_idx" unique="TRUE">
+				<field id="bik"/>
+			</index>						
+		</model>
+		
+		<model id="Client" parent="ModelSQL" dataTable="clients" virtual="FALSE">
+			<defaultOrder>
+				<field id="name"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="name" dataType="String" required="TRUE" length="100" alias="Наименование"/>
+			<field id="name_full" dataType="Text" alias="Полное наименование"/>
+			<field id="manager_comment" dataType="Text" alias="Комментарий"/>
+			<field id="client_type_id" dataType="Int" refTable="client_types" refField="id" alias="Вид контрагента"/>
+			<field id="client_kind" dataType="Enum" enumId="client_kinds" alias="Тип контрагента"/>
+			<field id="client_come_from_id" dataType="Int" refTable="client_come_from" refField="id" alias="Источник обращения"/>
+			<field id="manager_id" dataType="Int" refTable="users" refField="id" alias="Менеджер"/>
+			<field id="create_date" dataType="Date"/>
+			<field id="inn" dataType="String" length="12" alias="ИНН"/>
+			<field id="kpp" dataType="String" length="10" alias="КПП"/>
+			<field id="orgn" dataType="String" length="15" alias="ОГРН"/>
+			<field id="okpo" dataType="String" length="20" alias="ОКПО"/>
+			<field id="address_reg" dataType="Text" alias="Адрес регистрации"/>
+			<field id="address_fact" dataType="Text" alias="Адрес фактический"/>
+			<field id="address_post" dataType="Text" alias="Адрес почтовый"/>
+			<index id="clients_name_index">
+				<expression>lower(name)</expression>
+			</index>			
+		</model>
+		<model id="ClientList" parent="ModelSQL" dataTable="client_list_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="name" dataType="String" alias="Наименование"/>
+			<field id="manager_comment" dataType="Text" alias="Комметарий менеджера"/>			
+			<field id="client_type_id" dataType="String" sysCol="TRUE"/>
+			<field id="client_type_descr" dataType="String" alias="Тип клиента"/>
+			<field id="client_come_from_id" dataType="String" sysCol="TRUE"/>
+			<field id="client_come_from_descr" dataType="String"/>
+			<field id="client_kind" dataType="String" alias="Вид клиента"/>
+			<field id="manager_id" dataType="Int" sysCol="TRUE"/>
+			<field id="manager_descr" dataType="String" alias="Менеджер"/>			
+			<field id="tel_name" dataType="String" alias="Параметр телефон"/>			
+			<field id="tel_value" dataType="String" alias="Значение параметра телефон"/>			
+			<field id="email_name" dataType="String" alias="Параметр эл.почта"/>			
+			<field id="email_value" dataType="String" alias="Значение параметра эл.почты"/>						
+		</model>
+		<model id="ClientDialog" parent="ModelSQL" dataTable="client_dialog" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
+			<field id="name" dataType="String" required="TRUE" length="100" display="TRUE"/>
+			<field id="name_full" dataType="Text" required="TRUE" alias="Полное наименование"/>
+			<field id="manager_comment" dataType="Text" alias="Комментарий"/>			
+			<field id="phone_cel" dataType="String"/>
+			<field id="quant" dataType="String"/>
+			<field id="client_type_id" dataType="String"/>
+			<field id="client_type_descr" dataType="String"/>
+			<field id="client_come_from_id" dataType="String"/>
+			<field id="client_come_from_descr" dataType="String"/>
+			<field id="client_kind" dataType="String"/>
+			<field id="manager_id" dataType="Int"/>
+			<field id="manager_descr" dataType="String"/>
+			<field id="contact_first_name" dataType="String"/>
+			<field id="contact_middle_name" dataType="String"/>
+			<field id="contact_last_name" dataType="String"/>
+			<field id="contact_post" dataType="String"/>
+			<field id="contact_description" dataType="String"/>
+			<field id="tel_name" dataType="String"/>
+			<field id="tel_value" dataType="String"/>
+			<field id="email_name" dataType="String"/>
+			<field id="email_name" dataType="String"/>
+			<field id="inn" dataType="String" alias="ИНН"/>
+			<field id="kpp" dataType="String" alias="КПП"/>
+			<field id="orgn" dataType="String" alias="ОГРН"/>
+			<field id="okpo" dataType="String" alias="ОКПО"/>
+			<field id="address_reg" dataType="Text" alias="Адрес регистрации"/>
+			<field id="address_fact" dataType="Text" alias="Адрес фактический"/>
+			<field id="address_post" dataType="Text" alias="Адрес почтовый"/>			
+		</model>
+		<model id="ClientWithDetailsList" parent="ModelSQL" dataTable="client_with_details_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="name" dataType="String" alias="Наименование"/>
+			<field id="main" dataType="Bool"/>
+			<field id="contact_detail_name" dataType="String"/>
+			<field id="client_come_from_id" dataType="String"/>
+			<field id="contact_detail_value" dataType="String"/>
+			<field id="contact_detail_type" dataType="String"/>
+		</model>
+		<model id="ClientBank" parent="ModelSQL" dataTable="client_banks" virtual="FALSE">
+			<field id="client_id" primaryKey="TRUE" dataType="Int" refTable="clients" refField="id" alias="ID клиента"/>
+			<field id="bank_id" primaryKey="TRUE" dataType="Int" refTable="banks" refField="id" alias="ID банка"/>
+			<field id="account" dataType="String" length="20" alias="Расчетный счет"/>
+		</model>
+		<model id="ClientBankList" parent="ModelSQL" dataTable="client_banks_list" virtual="TRUE">
+			<field id="client_id" primaryKey="TRUE" dataType="Int" alias="ID клиента"/>
+			<field id="bank_id" primaryKey="TRUE" dataType="Int" alias="ID банка"/>
+			<field id="bik" dataType="String" alias="БИК"/>
+			<field id="name" dataType="String" alias="Наименование"/>
+			<field id="account" dataType="String" alias="Кор.счет"/>			
+		</model>
+		
+		<model id="Destination" parent="ModelSQL" dataTable="destinations" virtual="FALSE">
+			<defaultOrder>
+				<field id="name"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="name" dataType="String" required="TRUE" length="100" alias="Наименование" display="TRUE"/>
+			<field id="distance" dataType="Float" required="FALSE" length="15" precision="2" alias="Расстояние"/>
+			<field id="time_route" dataType="Time" required="TRUE" alias="Время"/>
+			<field id="price" dataType="Float" alias="Стоимость"/>
+			
+			<field id="zone" dataType="String"/>
+			
+			<index id="destination_name_index">
+				<expression>lower(name)</expression>
+			</index>			
+		</model>
+		<model id="DestinationList" parent="ModelSQL" dataTable="destination_list_view" virtual="TRUE">
+			<defaultOrder>
+				<field id="name"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
+			<field id="name" dataType="String" required="TRUE" length="100"/>
+			<field id="distance" dataType="String"/>
+			<field id="time_route" dataType="String"/>
+			<field id="price" dataType="String"/>
+		</model>
+		<model id="DestinationDialog" parent="ModelSQL" dataTable="destination_dialog_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="name" dataType="String"/>
+			<field id="distance" dataType="String"/>
+			<field id="time_route_descr" dataType="String"/>
+			<field id="price_descr" dataType="String"/>
+			<field id="zone_str" dataType="String"/>
+			<field id="zone_center_str" dataType="String"/>
+		</model>
+		<model id="ConcreteType" parent="ModelSQL" dataTable="concrete_types" virtual="FALSE">
+			<defaultOrder>
+				<field id="name"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="name" dataType="String" required="TRUE" length="100" alias="Наименование"/>
+			<field id="code_1c" dataType="String" required="TRUE" length="11" alias="Код 1С"/>
+			<field id="pres_norm" dataType="Float" required="TRUE" length="15" precision="3" alias="Норма давл."/>
+			<field id="mpa_ratio" dataType="Float" length="19" precision="5" alias="Кф.МПА"/>
+			<field id="price" dataType="Float" length="15" precision="2" alias="Цена"/>
+			<index id="code_1c_index">
+				<field id="code_1c" unique="TRUE"/>
+			</index>
+		</model>
+		<model id="VehicleMake" parent="ModelSQL" dataTable="vehicle_makes" virtual="FALSE">
+			<defaultOrder>
+				<field id="name"/>
+			</defaultOrder>		
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE" alias="Код"/>
+			<field id="name" dataType="String" required="TRUE" length="100" alias="Наименование"/>
+		</model>
+		
+		<model id="VehicleFeature" parent="ModelSQL" dataTable="vehicle_features" virtual="FALSE">
+			<defaultOrder>
+				<field id="name"/>
+			</defaultOrder>		
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE" alias="Код"/>
+			<field id="name" dataType="String" required="TRUE" length="100" alias="Наименование"/>
+		</model>
+		<model id="Tracker" parent="ModelSQL" dataTable="trackers" virtual="FALSE">
+			<defaultOrder>
+				<field id="id"/>
+			</defaultOrder>		
+			<field id="id" dataType="String" primaryKey="TRUE" required="TRUE" length="15" alias="Код"/>
+			<field id="sim_id" dataType="String" length="50" alias="Идентификатор SIM карты"/>
+			<field id="sim_number" dataType="String" length="10" alias="Номер SIM карты"/>
+		</model>
+		<model id="Driver" parent="ModelSQL" dataTable="drivers" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="name" dataType="String" required="TRUE" length="50" alias="Наименование"/>
+
+			<index id="driver_name_index">
+				<expression>lower(name)</expression>
+			</index>			
+		</model>
+		<model id="DriverList" parent="ModelSQL" dataTable="drivers_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="name" dataType="String" alias="Наименование"/>
+			<field id="tel_name" dataType="String" alias="Наименование контактной информации с телефоном"/>
+			<field id="tel_value" dataType="String" alias="Значение контактной информации с телефоном"/>
+			<field id="email_name" dataType="String" alias="Наименование контактной информации с email"/>
+			<field id="email_value" dataType="String" alias="Значение контактной информации с email"/>
+		</model>
+		
+		<model id="DriverContactDetail" parent="ModelSQL" dataTable="driver_contact_details" virtual="FALSE">
+			<field id="driver_id" dataType="Int" refTable="drivers" refField="id" primaryKey="TRUE"/>
+			<field id="contact_detail_id" dataType="Int" refTable="contact_details" refField="id" primaryKey="TRUE"/>
+			<field id="main" dataType="Bool" defaultValue="FALSE"/>
+		</model>
+		<model id="DriverContactDetailList" parent="ModelSQL" dataTable="driver_contact_details_list" virtual="TRUE">
+			<field id="driver_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="contact_detail_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="main" dataType="String"/>
+			<field id="contact_detail_type" dataType="String"/>
+			<field id="contact_detail_name" dataType="String"/>
+			<field id="contact_detail_value" dataType="String"/>
+		</model>		
+
+		<model id="Vehicle" parent="ModelSQL" dataTable="vehicles" virtual="FALSE">
+			<defaultOrder>
+				<field id="plate"/>
+			</defaultOrder>		
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE" alias="Код"/>
+			<field id="plate" dataType="String" required="TRUE" length="6" alias="Номер"/>
+			<field id="load_capacity" dataType="Float" required="TRUE" length="15" precision="2" alias="Грузоподъемность"/>
+			<field id="vehicle_make_id" dataType="Int" required="FALSE" refTable="vehicle_makes" refField="id" alias="Марка"/>
+			<field id="vehicle_feature_id" dataType="Int" required="FALSE" refTable="vehicle_features" refField="id" alias="Свойства"/>
+			<field id="driver_id" dataType="Int" required="FALSE" refTable="drivers" refField="id" alias="Водитель"/>
+			<field id="client_id" dataType="Int" required="FALSE" refTable="clients" refField="id" alias="Владелец"/>
+			
+			<field id="tracker_id" dataType="String" length="15" refTable="trackers" refField="id" alias="Трэкер"/>
+			
+			<index id="vehicles_plate_index" unique="TRUE">
+				<expression>lower(plate)</expression>
+			</index>			
+			<index id="vehicles_client_idx">
+				<field id="client_id"/>
+			</index>			
+			<index id="vehicles_feature_idx">
+				<field id="vehicle_feature_id"/>
+			</index>			
+			<index id="vehicles_make_idx">
+				<field id="vehicle_make_id"/>
+			</index>						
+		</model>
+		<model id="VehicleDialog" parent="ModelSQL" dataTable="vehicle_dialog_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="plate" dataType="String" required="TRUE" length="6" alias="Номер"/>
+			<field id="load_capacity" dataType="Float" required="TRUE" length="15" precision="2" alias="Грузоподъемность"/>
+			<field id="driver_id" dataType="Int" alias="ID водитель"/>
+			<field id="driver_descr" dataType="String" alias="ФИО Водителя"/>
+			<field id="client_id" dataType="Int" alias="ID владельца"/>
+			<field id="client_descr" dataType="String" alias="ФИО владельца"/>
+			<field id="vehicle_make_id" dataType="Int" alias="ID марки"/>
+			<field id="vehicle_make_descr" dataType="String" alias="Наименование марки"/>
+			<field id="vehicle_feature_id" dataType="Int" alias="ID свойства"/>
+			<field id="vehicle_feature_descr" dataType="String" alias="Наименование свойства"/>
+			<field id="tracker_id" dataType="String" alias="Трэкер"/>
+			<field id="tracker_last_data" dataType="String" alias="Последние данные от трэкера"/>
+			<field id="tel_name" dataType="String" alias="Наименование основного телефона водителя"/>
+			<field id="tel_value" dataType="String" alias="Основной телефон водителя"/>
+			<field id="email_name" dataType="String" alias="Наименование основного email водителя"/>
+			<field id="email_value" dataType="String" alias="Основной email водителя"/>
+			<field id="pump_vehicle_unload_type" dataType="String" alias="Вид разгрузки"/>
+		</model>		
+		
+		<model id="RawMaterial" parent="ModelSQL" dataTable="raw_materials" virtual="FALSE">
+			<defaultOrder>
+				<field id="ord"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код">
+			</field>
+			<field id="name" dataType="String" required="TRUE" length="100" alias="Наименование">
+			</field>
+			<field id="planned_procurement" dataType="Float" length="19" precision="4" alias="Плановый приход">
+			</field>
+			<field id="supply_days_count" dataType="Int" alias="Дней завоза">
+			</field>
+			<field id="concrete_part" dataType="Bool" defaultValue="'false'"/>
+			<field id="ord" dataType="Int" required="TRUE"/>
+			<field id="supply_volume" dataType="Int" alias="Объем ТС завоза">
+			</field>
+			<field id="store_days" dataType="Int">
+			</field>
+			<field id="min_end_quant" dataType="Float" length="19" precision="3">
+			</field>
+			
+			<index id="raw_materials_name_index">
+				<expression>lower(name)</expression>
+			</index>						
+			<index id="raw_materials_concrete_part_index">
+				<field id="concrete_part"/>
+			</index>									
+			<index id="raw_materials_ord">
+				<field id="ord"/>
+			</index>									
+			
+		</model>		
+		<model id="RawMaterialProcurRate" parent="ModelSQL" dataTable="raw_material_procur_rates" virtual="FALSE">
+			<field id="material_id" dataType="Int" required="TRUE" refTable="raw_materials" refField="id" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="supplier_id" dataType="Int" required="TRUE" refTable="suppliers" refField="id" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="rate" dataType="Float" length="19" precision="2"/>
+		</model>		
+		<model id="RawMaterialProcurRateList" parent="ModelSQL" dataTable="raw_material_procur_rates_view" virtual="TRUE">
+			<field id="material_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="material_descr" dataType="String"/>
+			<field id="supplier_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="supplier_descr" dataType="String"/>
+			<field id="rate" dataType="Float"/>
+		</model>		
+
+		<model id="RawMaterialProcurUpload" parent="ModelSQL" dataTable="raw_material_procur_uploads" virtual="FALSE">
+			<field id="date_time" dataType="DateTime" primaryKey="TRUE" required="TRUE" alias="Дата">
+			</field>
+			<field id="descr" dataType="Text" alias="Описание ошибки">
+			</field>
+			<field id="result" dataType="Bool" alias="Результат">
+			</field>
+			<field id="doc_count" dataType="Int" alias="Кол-во документов">
+			</field>			
+		</model>		
+		<model id="RawMaterialProcurUploadView" parent="ModelSQL" dataTable="raw_material_procur_upload_view" virtual="TRUE">
+			<field id="date_time" dataType="DateTime" primaryKey="TRUE"/>
+			<field id="descr" dataType="Text"/>
+			<field id="result" dataType="Bool"/>
+			<field id="doc_count" dataType="Int"/>
+		</model>		
+		<model id="RawMaterialMinQuant" parent="ModelSQL" dataTable="raw_material_min_quants" virtual="FALSE">
+			<field id="material_id" dataType="Int" refTable="raw_materials" refField="id" primaryKey="TRUE">
+			</field>		
+			<field id="quant" dataType="Float" precision="3" length="19"/>
+		</model>		
+		
+		<model id="RawMaterialConsRateDate" parent="ModelSQL" dataTable="raw_material_cons_rate_dates" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" required="TRUE" autoInc="TRUE"/>
+			<field id="dt" dataType="Date" required="TRUE" alias="Дата"/>
+			<field id="name" dataType="Text" alias="Наименование"/>
+			<index id="raw_material_cons_rate_dates_dt_index">
+				<field id="dt"/>
+			</index>												
+		</model>		
+		<model id="RawMaterialConsRate" parent="ModelSQL" dataTable="raw_material_cons_rates" virtual="FALSE">
+			<field id="rate_date_id" dataType="Int" required="TRUE" refTable="raw_material_cons_rate_dates" refField="id" primaryKey="TRUE"/>
+			<field id="concrete_type_id" dataType="Int" refTable="concrete_types" refField="id" alias="Марка бетона" primaryKey="TRUE"/>
+			<field id="raw_material_id" dataType="Int" refTable="raw_materials" refField="id" alias="Материал" primaryKey="TRUE"/>
+			<field id="rate" dataType="Float" length="19" precision="4" alias="Расход"/>
+		</model>
+		
+		<model id="RawMaterialConsRateDateList" parent="ModelSQL" dataTable="raw_material_cons_rates_dates_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
+			<field id="dt" dataType="Date" sysCol="TRUE"/>
+			<field id="period" dataType="Text" alias="Период"/>
+			<field id="name" dataType="Text" alias="Комментарий"/>
+		</model>		
+		
+		<model id="PumpPrice" parent="ModelSQL" dataTable="pump_prices" virtual="FALSE">
+			<field id="id" autoInc="TRUE" primaryKey="TRUE" dataType="Int"/>
+			<field id="name" dataType="String" length="200"/>
+		</model>		
+		<model id="PumpPriceValue" parent="ModelSQL" dataTable="pump_prices_values" virtual="FALSE">
+			<field id="id" autoInc="TRUE" primaryKey="TRUE" dataType="Int"/>
+			<field id="pump_price_id" autoInc="TRUE" dataType="Int" refTable="pump_prices" refField="id"/>
+			<field id="quant_from" dataType="Float" length="19" precision="3"/>
+			<field id="quant_to" dataType="Float" length="19" precision="3"/>
+			<field id="price_m" dataType="Float" length="15" precision="2"/>
+			<field id="price_fixed" dataType="Float" length="15" precision="2"/>
+		</model>		
+		
+		<model id="PumpVehicle" parent="ModelSQL" dataTable="pump_vehicles" virtual="FALSE">
+			<field id="id" autoInc="TRUE" primaryKey="TRUE" dataType="Int"/>
+			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id"/>
+			<field id="pump_price_id" dataType="Int" refTable="pump_prices" refField="id"/>
+			<field id="phone_cel" dataType="String" length="15"/>
+			<field id="unload_type" dataType="Enum" enumId="unload_types" required="TRUE"/>
+			<index id="pump_vehicles_vehicle_id_idx" unique="TRUE">
+				<field id="vehicle_id"/>
+			</index>									
+			
+		</model>		
+		<model id="PumpVehicleList" parent="ModelSQL" dataTable="pump_vehicles_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="pump_price_id" dataType="Int" descr="ID справочника ценовой категории"/>
+			<field id="pump_price_descr" dataType="String" descr="Наименование справочника ценовой категории"/>
+			<field id="unload_type" dataType="String" descr="Вид разгрузки"/>
+			<field id="vh_id" dataType="Int" descr="ID ТС"/>
+			<field id="vh_owner_id" dataType="String" descr="ID владельца ТС"/>
+			<field id="vh_owner_tel_name" dataType="String" descr="Наименование основного телефона владельца ТС"/>
+			<field id="vh_owner_tel_value" dataType="String" descr="Основной телефон владельца ТС"/>
+			<field id="vh_owner_email_name" dataType="String" descr="Наименование основного email владельца ТС"/>
+			<field id="vh_owner_email_value" dataType="String" descr="Основной email владельца ТС"/>
+			<field id="vh_driver_tel_name" dataType="String" descr="Наименование основного телефона водителя ТС"/>
+			<field id="vh_driver_tel_value" dataType="String" descr="Основной телефон водителя ТС"/>
+			<field id="vh_driver_email_name" dataType="String" descr="Наименование основного email водителя ТС"/>
+			<field id="vh_driver_email_value" dataType="String" descr="Основной email водителя ТС"/>
+		</model>
+				
+		<model id="CurrentVehList" parent="ModelSQL" dataTable="pump_vehicles_list" virtual="TRUE">
+			<field id="id" dataType="Int" descr="ID расписания"/>
+			<field id="vehicle_id" dataType="Int" descr="ID ТС"/>
+			<field id="driver_id" dataType="Int" descr="ID водителя"/>
+			<field id="vh_plate" dataType="String" descr="Гос.номер ТС"/>
+			<field id="vh_owner_id" dataType="String" descr="ID владельца ТС"/>
+			<field id="vh_owner_descr" dataType="String" descr="Представление владельца ТС"/>			
+			<field id="vh_owner_tel_name" dataType="String" descr="Наименование основного телефона владельца ТС"/>
+			<field id="vh_owner_tel_value" dataType="String" descr="Основной телефон владельца ТС"/>
+			<field id="vh_owner_email_name" dataType="String" descr="Наименование основного email владельца ТС"/>
+			<field id="vh_owner_email_value" dataType="String" descr="Основной email владельца ТС"/>
+			<field id="vh_driver_descr" dataType="String" descr="Представление водителя ТС"/>
+			<field id="vh_driver_tel_name" dataType="String" descr="Наименование основного телефона водителя ТС"/>
+			<field id="vh_driver_tel_value" dataType="String" descr="Основной телефон водителя ТС"/>
+			<field id="vh_driver_email_name" dataType="String" descr="Наименование основного email водителя ТС"/>
+			<field id="vh_driver_email_value" dataType="String" descr="Основной email водителя ТС"/>
+			<field id="state" dataType="String" descr="Статус ТС"/>
+			<field id="state_date_time" dataType="DateTimeTZ" descr="Дата-время статуса ТС"/>
+			<field id="is_late" dataType="Bool" descr="ТС опаздывает"/>
+			<field id="is_late_at_dest" dataType="Bool" descr="ТС опаздывает на объекте"/>
+			<field id="idle_time" dataType="Int" descr="Время которое экипаж свободен"/>
+			<field id="waiting_time" dataType="Int" descr="время через которое экипаж освободится с рейса (вернуть в минутах)"/>
+			<field id="out_time" dataType="DateTime" descr="время выхода"/>
+			<field id="load_capacity" dataType="Float" length="15" precision="2" descr="Грузоподъемность ТС"/>
+			<field id="runs" dataType="Int" descr="Количество выполненных рейсов за текущую смену"/>
+			<field id="tracker_no_data" dataType="Bool" descr="Признак отсутствия сигнала от трэкера более определенного времени. Определяется константой no_tracker_signal_warn_interval"/>
+			<field id="no_tracker" dataType="Bool" descr="Признак отсутствия установленного оборудования мониторинга (трэкера) для ТС"/>
+			<field id="schedule_date" dataType="Date" descr="Поле для установки фильтра по дате"/>
+			<field id="out_comment" dataType="String" descr="Комметарий выхода со смены"/>
+		</model>
+		
+		
+		<model id="OrderTempComment" parent="ModelSQL" dataTable="order_temp_comments" virtual="FALSE">
+			<field id="id" autoInc="TRUE" primaryKey="TRUE" dataType="Int" alias="ID"/>
+			<field id="name" dataType="String" length="250" alias="Наименование"/>
+		</model>		
+		
+		<model id="Order" parent="ModelSQL" dataTable="orders" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
+			<field id="client_id" dataType="Int" refTable="clients" refField="id" alias="клиент"/>
+			<field id="concrete_type_id" dataType="Int" refTable="concrete_types" refField="id" alias="Марка бетона"/>
+			<field id="concrete_price" dataType="Float" length="15" precision="2" alias="Стоимость"/>
+			<field id="contact_id" dataType="Int" refTable="contacts" refField="id"/>			
+			<field id="destination_id" dataType="Int" refTable="destinations" refField="id" alias="Направление"/>
+			<field id="destination_price" dataType="Float" length="15" precision="2" alias="Стоимость дост."/>			
+			<field id="pump_vehicle_id" dataType="Int" refTable="pump_vehicles" refField="id" alias="Насос"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" alias="Автор"/>
+			<field id="address" dataType="Text"/>
+			<field id="comment_text" dataType="Text" alias="Комментарий"/>
+			<field id="date_time" dataType="DateTimeTZ" alias="Дата" required="TRUE"/>
+			<field id="date_time_to" dataType="DateTimeTZ" alias="Время до"/>
+			<field id="order_temp_comment_id" dataType="Int" refTable="order_temp_comments" refField="id"/>
+			<field id="pay_cash" dataType="Bool" defaultValue="FALSE" alias="Оплата на месте"/>
+			<field id="payed" dataType="Bool" defaultValue="FALSE"/>			
+			<field id="quant" dataType="Float" length="19" precision="4" alias="Количество"/>
+			<field id="quant_init" dataType="Float" length="19" precision="4" alias="Количество начальное"/>
+			<field id="temp" dataType="Bool" defaultValue="FALSE"/>
+			<field id="total" dataType="Float" length="15" precision="2" alias="Сумма"/>
+			<field id="total_edit" dataType="Bool" defaultValue="FALSE"/>
+			<field id="under_control" dataType="Bool" defaultValue="FALSE"/>
+			<field id="unload_price" dataType="Float" length="15" precision="2" alias="Стоимость прокачки"/>
+			<field id="unload_speed" dataType="Float" length="19" precision="4" alias="Разгрузка куб/ч"/>
+			<field id="unload_type" dataType="Enum" enumId="unload_types" alias="Прокачка"/>
+			<index id="date_time_index">
+				<field id="date_time"/>
+			</index>
+			<index id="client_id_index">
+				<field id="client_id"/>
+			</index>						
+			<index id="concrete_type_id_index">
+				<field id="concrete_type_id"/>
+			</index>
+			<index id="destination_id_index">
+				<field id="destination_id"/>
+			</index>												
+			<index id="order_temp_index">
+				<field id="temp"/>
+			</index>												
+			
+		</model>
+		
+		<model id="OrderList" parent="ModelSQL" dataTable="orders_list_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="number" dataType="String"/>
+			<field id="client_id" dataType="Int"/>
+			<field id="client_descr" dataType="String"/>
+			<field id="destination_id" dataType="Int"/>
+			<field id="destination_descr" dataType="String"/>
+			<field id="concrete_type_id" dataType="Int"/>
+			<field id="concrete_type_descr" dataType="String"/>
+			<field id="pump_vehicle_id" dataType="Int"/>
+			<field id="vh_id" dataType="Int"/>
+			<field id="address" dataType="String"/>
+			<field id="user_id" dataType="Int"/>
+			<field id="user_descr" dataType="String"/>
+			<field id="unload_type" dataType="String"/>
+			<field id="vh_client_id" dataType="Int"/>
+			<field id="vh_client_descr" dataType="String"/>
+			<field id="vh_plate" dataType="String"/>
+			<field id="comment_text" dataType="String"/>
+			<field id="unload_speed" dataType="Float"/>
+			<field id="date_time" dataType="DateTimeTZ"/>
+			<field id="date_time_to" dataType="DateTimeTZ"/>
+			<field id="quant" dataType="Float"/>
+			<field id="quant_init" dataType="Float"/>
+			<field id="quant_done" dataType="Float"/>
+			<field id="no_ship_mark" dataType="String"/>
+			<field id="status" dataType="String"/>
+			<field id="total" dataType="Float"/>
+			<field id="total_edit" dataType="Bool"/>
+			<field id="under_control" dataType="Bool"/>
+			<field id="payed" dataType="Bool"/>
+			<field id="pay_cash" dataType="Bool"/>
+			<field id="contact_id" dataType="Int"/>
+			<field id="order_edit" dataType="Bool"/>
+		</model>
+		<model id="OrderTempList" parent="ModelSQL" dataTable="orders_temp_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="number" dataType="String"/>
+			<field id="client_id" dataType="Int"/>
+			<field id="client_descr" dataType="String"/>
+			<field id="destination_id" dataType="Int"/>
+			<field id="destination_descr" dataType="String"/>
+			<field id="concrete_type_id" dataType="Int"/>
+			<field id="concrete_type_descr" dataType="String"/>
+			<field id="pump_vehicle_id" dataType="Int"/>
+			<field id="vh_id" dataType="Int"/>
+			<field id="address" dataType="String"/>
+			<field id="user_id" dataType="Int"/>
+			<field id="user_descr" dataType="String"/>
+			<field id="unload_type" dataType="String"/>
+			<field id="vh_client_id" dataType="Int"/>
+			<field id="vh_client_descr" dataType="String"/>
+			<field id="vh_plate" dataType="String"/>
+			<field id="comment_text" dataType="String"/>
+			<field id="unload_speed" dataType="Float"/>
+			<field id="date_time" dataType="DateTimeTZ"/>
+			<field id="date_time_to" dataType="DateTimeTZ"/>
+			<field id="quant" dataType="Float"/>
+			<field id="quant_init" dataType="Float"/>
+			<field id="quant_done" dataType="Float"/>
+			<field id="no_ship_mark" dataType="String"/>
+			<field id="status" dataType="String"/>
+			<field id="total" dataType="Float"/>
+			<field id="total_edit" dataType="Bool"/>
+			<field id="under_control" dataType="Bool"/>
+			<field id="payed" dataType="Bool"/>
+			<field id="pay_cash" dataType="Bool"/>
+			<field id="contact_id" dataType="Int"/>
+			<field id="order_temp_comment_id" dataType="Int"/>
+			<field id="order_temp_commen_descr" dataType="String"/>
+			<field id="order_edit" dataType="Bool"/>
+		</model>
+		
+		<model id="OrderCountList" parent="ModelSQL" dataTable="orders_count_on_period" virtual="TRUE">
+			<field id="date_time" dataType="DateTime"/>
+			<field id="cnt" dataType="Int"/>
+			<field id="quant" dataType="Float"/>
+			<field id="period" dataType="String"/>
+		</model>
+		
+		<model id="OrderPump" parent="ModelSQL" dataTable="order_pumps" virtual="FALSE">
+			<field id="order_id" dataType="Int" primaryKey="TRUE" required="FALSE" refTable="orders" refField="id"/>
+			<field id="viewed" dataType="Bool" defaultValue="TRUE"/>
+			<field id="comment" dataType="Text"/>
+		</model>
+		<model id="OrderPumpList" parent="ModelSQL" dataTable="order_pumps_list" virtual="TRUE">
+			<field id="order_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="number" dataType="String"/>
+			<field id="client_id" dataType="Int"/>
+			<field id="client_descr" dataType="String"/>
+			<field id="destination_descr" dataType="String"/>
+			<field id="concrete_type_descr" dataType="String"/>
+			<field id="unload_type_descr" dataType="String"/>
+			<field id="comment_text" dataType="Text"/>
+			<field id="descr" dataType="Text"/>
+			<field id="phone_cel" dataType="String"/>
+			<field id="date_time" dataType="DateTime"/>
+			<field id="date_time_descr" dataType="String"/>
+			<field id="quant" dataType="Float"/>
+			<field id="viewed" dataType="Bool"/>
+			<field id="comment" dataType="Text"/>
+		</model>
+		
+		<model id="Offer" parent="ModelSQL" dataTable="offers" virtual="FALSE">
+			<!-- inherited form orders -->
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
+			<field id="client_id" dataType="Int" refTable="clients" refField="id" alias="клиент"/>
+			<field id="destination_id" dataType="Int" refTable="destinations" refField="id" alias="Направление"/>
+			<field id="concrete_type_id" dataType="Int" refTable="concrete_types" refField="id" alias="Марка бетона"/>
+			<field id="unload_type" dataType="Enum" enumId="unload_types" alias="Прокачка"/>
+			<field id="comment_text" dataType="Text" alias="Комментарий"/>
+			<field id="descr" dataType="Text" alias="Описание"/>
+			<field id="date_time" dataType="DateTimeTZ" alias="Дата" required="TRUE"/>
+			<field id="date_time_to" dataType="DateTimeTZ" alias="Время до"/>
+			<field id="quant" dataType="Float" length="19" precision="4" alias="Количество"/>
+			<field id="unload_speed" dataType="Float" length="19" precision="4" alias="Разгрузка куб/ч"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" alias="Автор"/>
+			<field id="lang_id" dataType="Int" refTable="lags" refField="id" alias="Язык"/>
+			<field id="total" dataType="Float" length="15" precision="2" alias="Сумма"/>
+			<field id="concrete_price" dataType="Float" length="15" precision="2" alias="Стоимость"/>
+			<field id="destination_price" dataType="Float" length="15" precision="2" alias="Стоимость дост."/>
+			<field id="unload_price" dataType="Float" length="15" precision="2" alias="Стоимость прокачки"/>
+			<field id="pump_vehicle_id" dataType="Int" refTable="pump_vehicles" refField="id" alias="Насос"/>
+			<field id="pay_cash" dataType="Bool" defaultValue="FALSE" alias="Оплата на месте"/>
+			<field id="total_edit" dataType="Bool" defaultValue="FALSE"/>
+			<field id="payed" dataType="Bool" defaultValue="FALSE"/>
+			<field id="under_control" dataType="Bool" defaultValue="FALSE"/>
+			<field id="temp" dataType="Bool" defaultValue="FALSE"/>
+			<field id="address" dataType="Text"/>
+			<field id="contact_id" dataType="Int" refTable="contacts" refField="id"/>
+			
+			<field id="def_call_reply_id" dataType="Int" refTable="def_call_replies" refField="id"/>
+			<field id="call_id" dataType="String" refTable="calls" refField="unique_id"/>
+			
+			<index id="offers_call_id_idx" unique="TRUE">
+				<field id="call_id"/>
+			</index>															
+		</model>
+		<model id="OfferList" parent="ModelSQL" dataTable="offers_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="client_id" dataType="Int"/>
+			<field id="client_descr" dataType="String"/>
+			<field id="destination_id" dataType="Int"/>
+			<field id="destination_descr" dataType="String"/>
+			<field id="concrete_type_id" dataType="Int" alias="ID марки бетона"/>
+			<field id="concrete_type_descr" alias="Марка бетона"/>
+			<field id="unload_type" dataType="Enum" enumId="unload_types" alias="Прокачка"/>
+			<field id="comment_text" dataType="Text" alias="Комментарий"/>
+			<field id="date_time" dataType="DateTimeTZ" alias="Дата" required="TRUE"/>
+			<field id="date_time_to" dataType="DateTimeTZ" alias="Время до"/>
+			<field id="quant" dataType="Float" length="19" precision="4" alias="Количество"/>
+			<field id="unload_speed" dataType="Float" length="19" precision="4" alias="Разгрузка куб/ч"/>
+			<field id="total" dataType="Float" length="15" precision="2" alias="Сумма"/>
+			<field id="concrete_price" dataType="Float" length="15" precision="2" alias="Стоимость"/>
+			<field id="destination_price" dataType="Float" length="15" precision="2" alias="Стоимость дост."/>
+			<field id="unload_price" dataType="Float" length="15" precision="2" alias="Стоимость прокачки"/>
+			<field id="pump_vehicle_id" dataType="Int" alias="Насос"/>
+			<field id="vh_owner" dataType="String" alias="Владелец"/>
+			<field id="vh_plate" dataType="String" alias="ТС номер"/>
+			<field id="pay_cash" dataType="Bool" defaultValue="FALSE" alias="Оплата на месте"/>
+			<field id="total_edit" dataType="Bool" defaultValue="FALSE"/>
+			<field id="payed" dataType="Bool" defaultValue="FALSE"/>
+			<field id="under_control" dataType="Bool" defaultValue="FALSE"/>
+			<field id="address" dataType="Text"/>
+			
+			<field id="def_call_reply_id" dataType="Int"/>
+			<field id="def_call_reply_descr" dataType="String"/>
+		</model>
+		
+		<model id="OrderMakeList" parent="ModelSQL" dataTable="orders_make_list_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="number" dataType="String"/>
+			<field id="client_id" dataType="Int"/>
+			<field id="client_descr" dataType="String"/>
+			<field id="destination_id" dataType="Int"/>
+			<field id="destination_descr" dataType="String"/>
+			<field id="concrete_type_id" dataType="Int"/>
+			<field id="concrete_type_descr" dataType="String"/>
+			<field id="pump_vehicle_id" dataType="Int"/>
+			<field id="vh_id" dataType="Int"/>
+			<field id="address" dataType="String"/>
+			<field id="user_id" dataType="Int"/>
+			<field id="user_descr" dataType="String"/>
+			<field id="unload_type" dataType="String"/>
+			<field id="vh_client_id" dataType="Int"/>
+			<field id="vh_client_descr" dataType="String"/>
+			<field id="vh_plate" dataType="String"/>
+			<field id="comment_text" dataType="String"/>
+			<field id="unload_speed" dataType="Float"/>
+			<field id="date_time" dataType="DateTimeTZ"/>
+			<field id="date_time_to" dataType="DateTimeTZ"/>
+			<field id="quant" dataType="Float"/>
+			<field id="quant_init" dataType="Float"/>
+			<field id="quant_done" dataType="Float"/>
+			<field id="no_ship_mark" dataType="String"/>
+			<field id="status" dataType="String"/>
+			<field id="total" dataType="Float"/>
+			<field id="total_edit" dataType="Bool"/>
+			<field id="under_control" dataType="Bool"/>
+			<field id="payed" dataType="Bool"/>
+			<field id="pay_cash" dataType="Bool"/>
+			<field id="contact_id" dataType="Int"/>
+			<field id="order_edit" dataType="Bool"/>
+		</model>
+		
+		<model id="OrderDialog" parent="ModelSQL" dataTable="order_dialog_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="number" dataType="String"/>
+			<field id="client_id" dataType="Int"/>
+			<field id="client_descr" dataType="String"/>
+			<field id="destination_id" dataType="Int"/>
+			<field id="destination_descr" dataType="String"/>
+			<field id="concrete_type_id" dataType="Int"/>
+			<field id="concrete_type_descr" dataType="String"/>
+			<field id="pump_vehicle_id" dataType="Int"/>
+			<field id="vh_id" dataType="Int"/>
+			<field id="address" dataType="String"/>
+			<field id="user_id" dataType="Int"/>
+			<field id="user_descr" dataType="String"/>
+			<field id="unload_type" dataType="String"/>
+			<field id="vh_client_id" dataType="Int"/>
+			<field id="vh_client_descr" dataType="String"/>
+			<field id="vh_plate" dataType="String"/>
+			<field id="comment_text" dataType="String"/>
+			<field id="unload_speed" dataType="Float"/>
+			<field id="date_time" dataType="DateTimeTZ"/>
+			<field id="date_time_to" dataType="DateTimeTZ"/>
+			<field id="quant" dataType="Float"/>
+			<field id="quant_init" dataType="Float"/>
+			<field id="quant_done" dataType="Float"/>
+			<field id="no_ship_mark" dataType="String"/>
+			<field id="status" dataType="String"/>
+			<field id="total" dataType="Float"/>
+			<field id="total_edit" dataType="Bool"/>
+			<field id="under_control" dataType="Bool"/>
+			<field id="payed" dataType="Bool"/>
+			<field id="pay_cash" dataType="Bool"/>
+			<field id="contact_id" dataType="Int"/>
+			<field id="temp" dataType="Bool"/>
+			<field id="order_temp_comment_id" dataType="Int"/>
+			<field id="order_temp_comment_descr" dataType="String"/>
+			<field id="order_edit" dataType="Bool"/>
+		</model>
+		
+		<model id="Shipment" parent="ModelSQL" dataTable="shipments" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="date_time" dataType="DateTimeTZ" alias="Дата" required="TRUE"/>
+			<field id="order_id" dataType="Int" required="TRUE" refTable="orders" refField="id" alias="Заявка"/>
+			<field id="vehicle_schedule_id" dataType="Int" required="TRUE" refTable="vehicle_schedules" refField="id" alias="Экипаж"/>
+			<field id="quant" dataType="Float" length="19" precision="4" alias="Количество"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" alias="Автор"/>
+			<field id="demurrage" dataType="Time" alias="Простой"/>
+			
+			<index id="shipments_date_time_index">
+				<field id="date_time"/>
+			</index>						
+			<index id="shipments_order_id_index">
+				<field id="order_id"/>
+			</index>						
+		</model>
+		
+		<model id="ShipmentList" parent="ModelSQL" dataTable="shipment_base" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="order_id" dataType="Int" alias="ID заявки"/>
+			<field id="order_number" dataType="String" alias="номер заявки"/>
+			<field id="order_quant" dataType="Float" alias="Количество заявки"/>
+			<field id="vehicle_schedule_id" dataType="Int" alias="ID расписания"/>
+			<field id="ship_date_time" dataType="DateTimeTZ" alias="Дата-время отгрузки"/>
+			<field id="date_time" dataType="DateTimeTZ" alias="Дата-время назначения"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="cost" dataType="Float" alias="Стоимость"/>
+			<field id="shipped" dataType="Bool" alias="Отгружен"/>
+			<field id="concrete_type_id" dataType="Int" alias="ID марки"/>
+			<field id="concrete_type_descr" dataType="String" alias="Представление марки"/>
+			<field id="vh_id" dataType="Int" alias="ID ТС"/>
+			<field id="vh_client_id" dataType="Int" alias="ID владельца ТС"/>
+			<field id="vh_client_descr" dataType="String" alias="Представление владельца ТС"/>
+			<field id="vh_plate" dataType="String" alias="Гос.номер ТС"/>
+			<field id="driver_id" dataType="Int" alias="ID водителя"/>
+			<field id="driver_descr" dataType="String" alias="Прелставление водителя"/>
+			<field id="destination_id" dataType="Int" alias="Объект"/>
+			<field id="destination_descr" dataType="String" alias="Объект"/>
+			<field id="client_id" dataType="Int" alias="ID клиента"/>
+			<field id="client_descr" dataType="String" alias="Представление клиента"/>
+			<field id="demurrage_cost" dataType="Float" alias="Стоимость простоя"/>
+			<field id="user_id" dataType="Int" alias="ID пользователя"/>
+			<field id="user_descr" dataType="String" alias="Представление пользователя"/>
+			<field id="demurrage" dataType="Time" alias="Время простоя"/>
+			<field id="is_late" dataType="Bool" alias="Опаздывает"/>
+		</model>
+		<model id="ShipmentDialog" parent="ModelSQL" dataTable="shipment_dialog_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="order_id" dataType="Int" alias="ID заявки"/>
+			<field id="order_number" dataType="String" alias="номер заявки"/>
+			<field id="order_quant" dataType="Float" alias="Количество заявки"/>
+			<field id="vehicle_schedule_id" dataType="Int" alias="ID расписания"/>
+			<field id="ship_date_time" dataType="DateTimeTZ" alias="Дата-время отгрузки"/>
+			<field id="date_time" dataType="DateTimeTZ" alias="Дата-время назначения"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="cost" dataType="Float" alias="Стоимость"/>
+			<field id="shipped" dataType="Bool" alias="Отгружен"/>
+			<field id="concrete_type_id" dataType="Int" alias="ID марки"/>
+			<field id="concrete_type_descr" dataType="String" alias="Представление марки"/>
+			<field id="vh_id" dataType="Int" alias="ID ТС"/>
+			<field id="vh_client_id" dataType="Int" alias="ID владельца ТС"/>
+			<field id="vh_client_descr" dataType="String" alias="Представление владельца ТС"/>
+			<field id="vh_plate" dataType="String" alias="Гос.номер ТС"/>
+			<field id="driver_id" dataType="Int" alias="ID водителя"/>
+			<field id="driver_descr" dataType="String" alias="Прелставление водителя"/>
+			<field id="destination_id" dataType="Int" alias="Объект"/>
+			<field id="destination_descr" dataType="String" alias="Объект"/>
+			<field id="client_id" dataType="Int" alias="ID клиента"/>
+			<field id="client_descr" dataType="String" alias="Представление клиента"/>
+			<field id="demurrage_cost" dataType="Float" alias="Стоимость простоя"/>
+			<field id="user_id" dataType="Int" alias="ID пользователя"/>
+			<field id="user_descr" dataType="String" alias="Представление пользователя"/>
+			<field id="demurrage" dataType="Time" alias="Время простоя"/>
+			<field id="is_late" dataType="Bool" alias="Опаздывает"/>
+		</model>
+		
+		<model id="ShipmentForOrderList" parent="ModelSQL" dataTable="shipment_for_order_list_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="order_id" dataType="Int" alias="ID заявки"/>
+			<field id="order_number" dataType="String" alias="номер заявки"/>
+			<field id="order_quant" dataType="Float" alias="Количество заявки"/>
+			<field id="vehicle_schedule_id" dataType="Int" alias="ID расписания"/>
+			<field id="ship_date_time" dataType="DateTimeTZ" alias="Дата-время отгрузки"/>
+			<field id="date_time" dataType="DateTimeTZ" alias="Дата-время назначения"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="cost" dataType="Float" alias="Стоимость"/>
+			<field id="shipped" dataType="Bool" alias="Отгружен"/>
+			<field id="concrete_type_id" dataType="Int" alias="ID марки"/>
+			<field id="concrete_type_descr" dataType="String" alias="Представление марки"/>
+			<field id="vh_client_id" dataType="Int" alias="ID владельца ТС"/>
+			<field id="vh_client_descr" dataType="String" alias="Представление владельца ТС"/>
+			<field id="vh_plate" dataType="String" alias="Гос.номер ТС"/>
+			<field id="driver_id" dataType="Int" alias="ID водителя"/>
+			<field id="driver_descr" dataType="String" alias="Прелставление водителя"/>
+			<field id="destination_id" dataType="Int" alias="Объект"/>
+			<field id="destination_descr" dataType="String" alias="Объект"/>
+			<field id="client_id" dataType="Int" alias="ID клиента"/>
+			<field id="client_descr" dataType="String" alias="Представление клиента"/>
+			<field id="demurrage_cost" dataType="Float" alias="Стоимость простоя"/>
+			<field id="user_id" dataType="Int" alias="ID пользователя"/>
+			<field id="user_descr" dataType="String" alias="Представление пользователя"/>
+			<field id="state_assigned" dataType="DateTimeTZ" alias="Время статуса назначено"/>
+			<field id="state_left_for_dest" dataType="DateTimeTZ" alias="Время статуса выехал на объект"/>			
+			<field id="state_at_dest" dataType="DateTimeTZ" alias="Время статуса на объкете"/>
+			<field id="state_left_for_base" dataType="DateTimeTZ" alias="Время статуса выехал на базу"/>			
+			<field id="state_free" dataType="DateTimeTZ" alias="Время статуса свободен"/>
+			<field id="state" dataType="String" alias="Текущий статус"/>			
+			<field id="is_late" dataType="String" alias="Признак опоздания"/>						
+			<field id="next_state_date_time" dataType="DateTimeTZ" alias="Расчетное время следующего статуса"/>			
+		</model>
+		<model id="ShipmentPumpList" parent="ModelSQL" dataTable="shipments_pumps_list" virtual="TRUE">
+			<field id="ship_date_time" dataType="DateTime"/>
+			<field id="ship_date_time_descr" dataType="String" alias="Дата отгрузки"/>
+			<field id="client_id" dataType="Int" alias="Код клиента"/>
+			<field id="client_descr" dataType="String" alias="Клиент"/>
+			<field id="destination_id" dataType="Int" alias="Код объекта"/>
+			<field id="destination_descr" dataType="String" alias="Объект"/>			
+			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="pump_price" dataType="Float" alias="Цена насоса"/>
+			<field id="owner" dataType="String" alias="Владелец"/>
+			<field id="plate" dataType="String" alias="Гос.номер"/>
+			<field id="driver_descr" dataType="String" alias="Водитель"/>
+			<field id="demurrage" dataType="String" alias="Простой"/>
+			<field id="blanks_exist" dataType="String" alias="Бланки"/>
+		</model>
+		<model id="ShipmentDateList" parent="ModelSQL" dataTable="shipment_date_list" virtual="TRUE">
+			<field id="ship_date" dataType="DateTime"/>
+			<field id="ship_date_descr" dataType="String" alias="Дата отгрузки"/>
+			<field id="client_id" dataType="Int" alias="Код клиента"/>
+			<field id="client_descr" dataType="String" alias="Клиент"/>
+			<field id="concrete_type_id" dataType="Int" alias="Код марки"/>
+			<field id="concrete_type_descr" dataType="String" alias="Марка"/>			
+			<field id="destination_id" dataType="Int" alias="Код объекта"/>
+			<field id="destination_descr" dataType="String" alias="Объект"/>			
+			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="ship_cost" dataType="Float" alias="Стоимость доставки"/>
+		</model>
+		<model id="ShipmentTimeList" parent="ModelSQL" dataTable="shipment_time_list" virtual="TRUE">
+			<field id="id" dataType="String" alias="№" primaryKey="TRUE"/>
+			<field id="client_id" dataType="Int" alias="Код клиента"/>
+			<field id="client_descr" dataType="String" alias="Клиент"/>
+			<field id="destination_id" dataType="Int" alias="Код объекта"/>
+			<field id="destination_descr" dataType="String" alias="Объект"/>			
+			<field id="quant" dataType="Float" alias="Объем"/>
+			<field id="vehicle_plate" dataType="String" alias="Номер ТС"/>
+			<field id="driver_id" dataType="Int" alias="Водитель код"/>
+			<field id="driver_descr" dataType="String" alias="Водитель"/>
+			<field id="assign_date_time" dataType="DateTime" alias="Назначение"/>
+			<field id="assign_date_time_descr" dataType="String" alias="Назначение"/>
+			<field id="ship_date_time" dataType="DateTime" alias="Отгрузка"/>
+			<field id="ship_date_time_descr" dataType="String" alias="Отгрузка"/>			
+			<field id="dispatcher_fail_min" dataType="Int" alias="Опоздание диспетчара (мин)"/>			
+			<field id="ship_time_norm" dataType="Int" alias="Норма погрузки (мин)"/>
+			<field id="operator_fail_min" dataType="Int" alias="Опоздание оператора (мин)"/>
+			<field id="total_fail_min" dataType="Int" alias="Опоздание общее (мин)"/>
+		</model>
+		
+		<model id="ShipmentOperator" parent="ModelSQL" dataTable="shipment_operator_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="client_descr" dataType="String"/>
+			<field id="destination_descr" dataType="String"/>
+			<field id="concrete_type_descr" dataType="String"/>
+			<field id="vehicle_schedule_descr" dataType="String"/>
+			<field id="time_descr" dataType="String"/>
+			<field id="quant" dataType="Float"/>
+			<field id="shipped" dataType="Bool"/>
+		</model>
+		
+		<model id="VehicleSchedule" parent="ModelSQL" dataTable="vehicle_schedules" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="schedule_date" dataType="Date" alias="Дата"/>
+			<field id="vehicle_id" dataType="Int" required="TRUE" refTable="vehicles" refField="id" alias="Автомобиль"/>
+			<field id="driver_id" dataType="Int" required="TRUE" refTable="drivers" refField="id" alias="Водитель"/>
+			
+			<index id="schedule_date_index">
+				<field id="schedule_date"/>
+			</index>						
+			<index id="driver_id_index">
+				<field id="driver_id"/>
+			</index>						
+			<index id="vehicle_id_index">
+				<field id="vehicle_id"/>
+			</index>						
+		</model>
+		<model id="OutComment" parent="ModelSQL" dataTable="out_comments" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="vehicle_schedule_id" dataType="Int" required="TRUE" refTable="vehicle_schedules" refField="id"/>
+			<field id="comment_text" dataType="Text" alias="Комментарий"/>
+			
+			<index id="out_comments_vehicle_schedule_id_index">
+				<field id="vehicle_schedule_id"/>
+			</index>						
+		</model>
+		
+		<model id="VehicleScheduleList" parent="ModelSQL" dataTable="vehicle_schedule_list_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="schedule_date" dataType="Date"/>
+			<field id="vehicle_id" dataType="Int"/>
+			<field id="vh_plate" dataType="String"/>
+			<field id="driver_id" dataType="Int"/>
+			<field id="vh_driver_descr" dataType="String"/>
+			<field id="vh_driver_tel_name" dataType="String"/>
+			<field id="vh_driver_tel_value" dataType="String"/>
+			<field id="vh_driver_email_name" dataType="String"/>
+			<field id="vh_driver_email_value" dataType="String"/>
+			<field id="vh_owner_id" dataType="String" descr="ID владельца ТС"/>			
+			<field id="vh_owner_descr" dataType="String"/>			
+			<field id="state" dataType="Enum" enumId="vehicle_states"/>
+			<field id="load_capacity" dataType="Float"/>			
+			<field id="out_comment" dataType="String"/>
+			<field id="on_shift" dataType="String"/>			
+		</model>
+		<model id="VehicleScheduleComplete" parent="ModelSQL" dataTable="vehicle_schedule_complete_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="vehicle_schedule_descr" dataType="String"/>
+		</model>
+		
+		<model id="VehicleScheduleState" parent="ModelSQL" dataTable="vehicle_schedule_states" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="date_time" dataType="DateTime" alias="Дата" required="TRUE"/>
+			<field id="state" dataType="Enum" enumId="vehicle_states" alias="Состояние" required="TRUE"/>
+			<field id="schedule_id" dataType="Int" refTable="vehicle_schedules" refField="id" alias="Расписание"/>
+			<field id="shipment_id" dataType="Int" refTable="shipments" refField="id" alias="Отгрузка"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id"/>
+			<index id="vehicle_schedule_states_date_time_index">
+				<field id="date_time"/>
+			</index>									
+		</model>
+
+		<model id="ShipmentRep" virtual="TRUE" dataTable="shipment_report" parent="ModelReportSQL">
+			<field id="ship_date_time" dataType="DateTime"/>
+			<field id="shift_descr" dataType="Date" alias="Смена"/>
+			<field id="concrete_id" dataType="Int"/>
+			<field id="concrete_descr" dataType="String" alias="Марка бетона"/>
+			<field id="client_id" dataType="Int"/>
+			<field id="client_descr" dataType="String" alias="Клиент"/>
+			<field id="destination_id" dataType="Int"/>
+			<field id="destination_descr" dataType="String" alias="Объект"/>
+			<field id="driver_id" dataType="Int"/>
+			<field id="driver_descr" dataType="String" alias="Водитель"/>
+			<field id="vehicle_id" dataType="Int"/>
+			<field id="vehicle_descr" dataType="String" alias="Автомобиль"/>
+			<field id="vehicle_feature" dataType="String" alias="Свойство автом."/>
+			<field id="vehicle_owner" dataType="String" alias="Владелец автом."/>
+			<field id="quant_shipped" dataType="Float" alias="Количество"/>
+		</model>
+		<model id="Supplier" parent="ModelSQL" dataTable="suppliers" virtual="FALSE">
+			<defaultOrder>
+				<field id="name"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="name" dataType="String" required="TRUE" length="100" alias="Наименование"/>
+			<field id="name_full" dataType="Text" required="TRUE" alias="Полное наименование"/>
+			<field id="tel" dataType="String" length="15" alias="Мобильный телефон"/>
+			<field id="tel2" dataType="String" length="15" alias="Мобильный телефон"/>
+			<field id="lang_id" dataType="Int" required="FALSE" refTable="langs" refField="id"/>			
+			<field id="ext_ref_scales" dataType="String" length="36"/>
+			
+			<index id="suppliers_name_index">
+				<expression>lower(name)</expression>
+			</index>
+			<index id="suppliers_ext_ref_scales_index">
+				<field id="ext_ref_scales"/>
+			</index>						
+		</model>		
+		<model id="SupplierList" parent="ModelSQL" dataTable="suppliers_list_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="name" dataType="String" length="100" alias="Наименование"/>
+			<field id="tel" dataType="String" length="15" alias="Телефон"/>
+		</model>		
+		<model id="DOCMaterialProcurement" parent="ModelSQLDOC" dataTable="doc_material_procurements" virtual="FALSE" modelType="DOC" docTypeId="material_procurement">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date_time" dataType="DateTime" required="TRUE" alias="Дата"/>
+			<field id="number" dataType="String" length="11" alias="Номер"/>
+			<field id="doc_ref" dataType="String" length="36"/>
+			<field id="processed" dataType="Bool" alias="Проведен" default="false"/>
+			<field id="user_id" dataType="Int" alias="Автор" refTable="users" refField="id"/>
+			<field id="supplier_id" dataType="Int" alias="Поставщик" refTable="suppliers" refField="id" required="TRUE"/>
+			<field id="carrier_id" dataType="Int" alias="Перевозчик" refTable="suppliers" refField="id" required="TRUE"/>
+			<field id="driver" dataType="String" length="100" alias="Водитель"/>
+			<field id="vehicle_plate" dataType="String" length="10" alias="гос.номер"/>
+			<field id="material_id" dataType="Int" alias="Материал" refTable="raw_materials" refField="id" required="TRUE"/>
+			<field id="quant_gross" dataType="Float" length="19" alias="Брутто" precision="2"/>
+			<field id="quant_net" dataType="Float" length="19" alias="Нетто" precision="2"/>
+			
+			<index id="doc_material_procurements_date_time_index">
+				<field id="date_time"/>
+			</index>			
+			<index id="doc_material_procurements_doc_ref_index" unique="TRUE">
+				<field id="doc_ref"/>
+			</index>
+			<index id="doc_material_procurements_supplier_id_index">
+				<field id="supplier_id"/>
+			</index>			
+			<index id="doc_material_procurements_material_id_index">
+				<field id="material_id"/>
+			</index>						
+			<registerAtcs>
+				<register id="RAMaterial"/>
+			</registerAtcs>						
+		</model>
+		<model id="DOCMaterialProcurementList" parent="ModelSQLDOC" dataTable="doc_material_procurements_list_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="date_time" dataType="DateTime"/>
+			<field id="date_time_descr" dataType="String"/>
+			<field id="number" dataType="String"/>
+			<field id="processed" dataType="String"/>
+			<field id="supplier_id" dataType="Int"/>
+			<field id="supplier_descr" dataType="String"/>						
+			<field id="carrier_id" dataType="Int"/>
+			<field id="carrier_descr" dataType="String"/>									
+			<field id="driver" dataType="String"/>
+			<field id="vehicle_plate" dataType="String"/>
+			<field id="material_id" dataType="Int"/>
+			<field id="material_descr" dataType="String"/>
+			<field id="quant_gross" dataType="String"/>
+			<field id="quant_net" dataType="String"/>
+		</model>
+		<model id="DOCMaterialInventory" parent="ModelSQLDOC" dataTable="doc_material_inventories" virtual="FALSE" modelType="DOC" docTypeId="material_inventory">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE">
+			</field>
+			<field id="date_time" dataType="DateTime" required="TRUE" alias="Дата">
+			</field>
+			<field id="number" dataType="Int" alias="Номер">
+			</field>
+			<field id="processed" dataType="Bool" alias="Проведен" default="false"/>
+			<index id="doc_material_inventories_date_time_index">
+				<field id="date_time"/>
+			</index>			
+			<index id="doc_material_inventories_number_index" unique="TRUE">
+				<field id="number"/>
+			</index>
+			<registerAtcs>
+				<register id="RAMaterial"/>
+			</registerAtcs>						
+		</model>
+		<model id="DOCMaterialInventoryList" parent="ModelSQLDOC" dataTable="doc_material_inventories_list_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="date_time" dataType="DateTime"/>
+			<field id="date_time_descr" dataType="String"/>
+			<field id="number" dataType="String"/>
+			<field id="processed" dataType="String"/>
+		</model>
+		<model id="DOCMaterialInventoryDOCTMaterial" parent="ModelSQLDOCT" dataTable="doc_material_inventories_t_tmp_materials" virtual="FALSE" modelType="DOCT" masterModel="DOCMaterialInventory">
+			<field id="login_id" dataType="Int" refTable="logins" refField="id" primaryKey="TRUE"/>
+			<field id="line_number" dataType="Int" primaryKey="TRUE"/>
+			<field id="material_id" dataType="Int" alias="Материал" refTable="raw_materials" refField="id" required="TRUE">
+			</field>			
+			<field id="quant" dataType="Float" alias="Количество" length="19" precision="3">
+			</field>			
+		</model>				
+		<model id="DOCMaterialInventoryDOCTMaterialList" parent="ModelSQLDOCT" dataTable="doc_material_inventories_t_tmp_materials_list_view" virtual="TRUE">
+			<field id="login_id" dataType="Int"/>
+			<field id="line_number" dataType="Int" alias="№" primaryKey="TRUE"/>
+			<field id="material_id" dataType="Int"/>
+			<field id="material_descr" dataType="String"/>			
+			<field id="quant" dataType="Float"/>
+		</model>
+		<model id="DOCMaterialInventoryDOCTFMaterial" parent="ModelSQL" dataTable="doc_material_inventories_t_materials" virtual="FALSE" modelType="DOCTF" masterModel="DOCMaterialInventory">
+			<field id="doc_id" dataType="Int" refTable="doc_material_inventories" refField="id" primaryKey="TRUE"/>
+			<field id="line_number" dataType="Int" primaryKey="TRUE"/>
+			<field id="material_id" dataType="Int" alias="Материал" refTable="raw_materials" refField="id" required="TRUE">
+			</field>			
+			<field id="quant" dataType="Float" alias="Количество" length="19" precision="3">
+			</field>			
+		</model>				
+		
+		<model id="RGMaterialConsuption" parent="ModelSQL" dataTable="rg_material_consumption" virtual="FALSE" modelType="RG" period="1 month" balance="FALSE">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код">
+			</field>
+			<field id="date_time" dataType="DateTime" required="TRUE" alias="Период">
+			</field>
+			<field id="concrete_type_id" dataType="Int" refTable="concrete_types" refField="id" regFieldType="dimension">
+			</field>
+			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id" regFieldType="dimension">
+			</field>			
+			<field id="driver_id" dataType="Int" refTable="drivers" refField="id" regFieldType="dimension">
+			</field>						
+			<field id="material_id" dataType="Int" refTable="raw_materials" refField="id" regFieldType="dimension">
+			</field>
+			<field id="concrete_quant" dataType="Float" alias="Количество бетона" length="19" precision="3">
+			</field>
+			<field id="material_quant" dataType="Float" alias="Количество материалов" length="19" precision="3">
+			</field>			
+			<index id="rg_material_consuption_date_time_index">
+				<field id="date_time"/>
+			</index>			
+			<index id="rg_material_consuption_concrete_type_id_index">
+				<field id="concrete_type_id"/>
+			</index>									
+			<index id="rg_material_consuption_vehicle_id_index">
+				<field id="vehicle_id"/>
+			</index>												
+			<index id="rg_material_consuption_driver_id_index">
+				<field id="driver_id"/>
+			</index>															
+			<index id="rg_material_consuption_material_id_index">
+				<field id="material_id"/>
+			</index>									
+		</model>				
+		<model id="RAMaterialConsumption" parent="ModelSQL" dataTable="ra_material_consumption" virtual="FALSE" modelType="RA" regTypeId="material_consumption" balance="FALSE">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код">
+			</field>
+			<field id="date_time" dataType="DateTime" alias="Дата"/>
+			<field id="doc_type" dataType="Enum" enumId="doc_types" alias="Вид документа">
+			</field>	
+			<field id="doc_id" dataType="Int"/>
+			<field id="concrete_type_id" dataType="Int" alias="Бетон" refTable="concrete_types" refField="id" regFieldType="dimension">
+			</field>			
+			<field id="vehicle_id" dataType="Int" alias="ТС" refTable="vehicles" refField="id" regFieldType="dimension">
+			</field>						
+			<field id="driver_id" dataType="Int" alias="Водитель" refTable="drivers" refField="id" regFieldType="dimension">
+			</field>									
+			<field id="material_id" dataType="Int" alias="Материал" refTable="raw_materials" refField="id" regFieldType="dimension">
+			</field>
+			<field id="concrete_quant" dataType="Float" alias="Количество бетона" length="19" precision="3" regFieldType="fact">
+			</field>
+			<field id="material_quant" dataType="Float" alias="Количество материалов" length="19" precision="3" regFieldType="fact">
+			</field>
+			<field id="material_quant_norm" dataType="Float" alias="Количество материалов" length="19" precision="3" regFieldType="fact">
+			</field>
+			<field id="material_quant_corrected" dataType="Float" alias="Количество материалов" length="19" precision="3" regFieldType="fact">
+			</field>
+			
+			<index id="ra_material_consumption_doc_index">
+				<field id="doc_type"/>
+				<field id="doc_id"/>
+			</index>			
+			<index id="ra_material_consumption_date_time_index">
+				<field id="date_time"/>
+			</index>
+			<index id="ra_material_consumption_concrete_type_id_index">
+				<field id="concrete_type_id"/>
+			</index>			
+			<index id="ra_material_consumption_vehicle_id_index">
+				<field id="vehicle_id"/>
+			</index>												
+			<index id="ra_material_consumption_driver_id_index">
+				<field id="driver_id"/>
+			</index>															
+			<index id="ra_material_consumption_material_id_index">
+				<field id="material_id"/>
+			</index>									
+		</model>
+		<model id="RAMaterialConsumptionList" parent="ModelSQL" dataTable="ra_material_consumption_list_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="date_time" dataType="String"/>
+			<field id="date_time_descr" dataType="String"/>
+			<field id="concrete_type_id" dataType="String"/>
+			<field id="concrete_type_descr" dataType="String"/>
+			<field id="vehicle_id" dataType="String"/>
+			<field id="vehicle_descr" dataType="String"/>
+			<field id="driver_id" dataType="String"/>
+			<field id="driver_descr" dataType="String"/>			
+			<field id="material_id" dataType="String"/>
+			<field id="material_descr" dataType="String"/>
+			<field id="material_quant" dataType="String"/>
+			<field id="concrete_quant" dataType="String"/>
+		</model>
+		
+		<model id="RGMaterial" parent="ModelSQL" dataTable="rg_materials" virtual="FALSE" modelType="RG" period="1 month">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код">
+			</field>
+			<field id="date_time" dataType="DateTime" required="TRUE" alias="Период">
+			</field>
+			<field id="material_id" dataType="Int" alias="Материал" refTable="raw_materials" refField="id">
+			</field>
+			<field id="quant" dataType="Float" alias="Количество" length="19" precision="3">
+			</field>
+			<index id="rg_materials_date_time_index">
+				<field id="date_time"/>
+			</index>			
+			<index id="rg_materials_material_id_index">
+				<field id="material_id"/>
+			</index>						
+		</model>		
+		<model id="RAMaterial" parent="ModelSQL" dataTable="ra_materials" virtual="FALSE" modelType="RA" regTypeId="material">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код">
+			</field>
+			<field id="date_time" dataType="DateTime" required="TRUE" alias="Период">
+			</field>
+			<field id="deb" dataType="Bool" alias="Дебет">
+			</field>
+			<field id="doc_type" dataType="Enum" enumId="doc_types" alias="Вид документа" required="TRUE">
+			</field>	
+			<field id="doc_id" dataType="Int"/>
+			<field id="material_id" dataType="Int" alias="Материал" refTable="raw_materials" refField="id" regFieldType="dimension" required="TRUE">
+			</field>
+			<field id="quant" dataType="Float" alias="Количество" length="19" precision="3" regFieldType="fact">
+			</field>
+			<index id="ra_materials_date_time_index">
+				<field id="date_time"/>
+			</index>			
+			<index id="ra_materials_doc_index">
+				<field id="doc_type"/>
+				<field id="doc_id"/>
+			</index>						
+			<index id="ra_materials_material_id_index">
+				<field id="material_id"/>
+			</index>						
+		</model>		
+
+		<model id="Shift" parent="ModelSQL" dataTable="shifts" virtual="FALSE">
+			<field id="date" dataType="DateTime" primaryKey="TRUE" autoInc="FALSE" required="TRUE" alias="Дата">
+			</field>
+			<field id="closed" dataType="Bool" primaryKey="FALSE" autoInc="FALSE" required="FALSE" alias="Закрыта">
+			</field>
+			<field id="close_date_time" dataType="DateTime" primaryKey="FALSE" autoInc="FALSE" required="FALSE" alias="Дата закрытия">
+			</field>
+		</model>
+		
+		<model id="Lang" parent="ModelSQL" dataTable="langs" virtual="FALSE">
+			<defaultOrder>
+				<field id="name"/>
+			</defaultOrder>
+		
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код">
+			</field>
+			<field id="name" dataType="String" primaryKey="FALSE" autoInc="FALSE" required="TRUE" alias="Наименование">
+			</field>
+			<index id="langs_name_index">
+				<expression>lower(name)</expression>
+			</index>			
+		</model>
+		<model id="SMSPattern" parent="ModelSQL" dataTable="sms_patterns" virtual="FALSE">
+			<defaultOrder>
+				<field id="id"/>
+			</defaultOrder>
+		
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код">
+			</field>
+			<field id="lang_id" dataType="Int" primaryKey="FALSE" autoInc="FALSE" required="TRUE" alias="Язык">
+			</field>
+			<field id="sms_type" dataType="Enum" primaryKey="FALSE" enumId="sms_types" autoInc="FALSE" required="TRUE" alias="Тип SMS">
+			</field>
+			<field id="pattern" dataType="Text" required="TRUE" alias="Шаблон">
+			</field>			
+			<index id="sms_patterns_type_lang_index" unique="TRUE">
+				<field id="sms_type"/>
+				<field id="lang_id"/>
+			</index>			
+		</model>
+		<model id="SMSPatternList" parent="ModelSQL" dataTable="sms_patterns_list_view" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="sms_type" dataType="String"/>
+			<field id="sms_type_descr" dataType="String"/>
+			<field id="lang_descr" dataType="String"/>
+			<field id="lang_id" dataType="Int"/>
+			<field id="pattern" dataType="Text"/>
+		</model>
+		<model id="VehicleFeatureList" parent="ModelSQL" dataTable="vehicle_feature_list_view" virtual="TRUE">
+			<field id="feature" dataType="String"/>
+		</model>
+		<model id="VehicleMakeList" parent="ModelSQL" dataTable="vehicle_make_list_view" virtual="TRUE">
+			<field id="make" dataType="String"/>
+		</model>		
+		<model id="VehicleOwnerList" parent="ModelSQL" dataTable="vehicle_owner_list_view" virtual="TRUE">
+			<field id="owner" dataType="String"/>
+		</model>
+		
+		<model id="LabData" parent="ModelSQL" dataTable="lab_data" virtual="FALSE">
+			<field id="shipment_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" required="TRUE" refTable="shipments" refField="id" alias="Отгрузка"/>
+			<field id="ok_sm" dataType="Float" alias="ОК см"/>
+			<field id="weight" dataType="Float" alias="масса"/>
+			<field id="weight_norm" dataType="Float" alias="масса норм"/>
+			<field id="percent_1" dataType="Float" alias="%"/>
+			<field id="p_1" dataType="Float" alias="p1"/>
+			<field id="p_2" dataType="Float" alias="p2"/>
+			<field id="p_3" dataType="Float" alias="p3"/>
+			<field id="p_4" dataType="Float" alias="p4"/>
+			<field id="p_7" dataType="Float" alias="p7"/>
+			<field id="p_28" dataType="Float" alias="p28"/>				
+			<field id="p_norm" dataType="Float" alias="p_norm"/>
+			<field id="percent_2" dataType="Float" alias="percent_2"/>
+			<field id="lab_comment" dataType="Text" alias="Комментарий"/>
+			<field id="num" dataType="Text" alias="№"/>
+		</model>
+		<model id="LabDataList" parent="ModelSQL" dataTable="lab_data_list_view" virtual="TRUE">
+			<field id="shipment_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="date_time" dataType="DateTime"/>
+			<field id="ship_date_time_descr" dataType="String" alias="Дата"/>
+			<field id="client_id" dataType="Int"/>
+			<field id="client_descr" dataType="String" alias="Заказчик"/>
+			<field id="client_phone" dataType="String" alias="Телефон"/>
+			<field id="destination_descr" dataType="String" alias="Объект"/>
+			<field id="concrete_type_descr" dataType="String" alias="Марка"/>
+			<field id="quant_descr" dataType="String" alias="Кол-во"/>
+			<field id="num" dataType="String" alias="№"/>
+				
+			<field id="driver_descr" dataType="String" alias="Водитель"/>
+			
+			<field id="ok_sm" dataType="Float" alias="ОК см"/>
+			<field id="weight" dataType="Float" alias="масса"/>
+			<field id="weight_norm" dataType="Float" alias="масса норм"/>
+			<field id="percent_1" dataType="Float" alias="%"/>
+			<field id="p_1" dataType="Float" alias="p1"/>
+			<field id="p_2" dataType="Float" alias="p2"/>
+			<field id="p_3" dataType="Float" alias="p3"/>
+			<field id="p_4" dataType="Float" alias="p4"/>
+			<field id="p_7" dataType="Float" alias="p7"/>
+			<field id="p_norm" dataType="Float" alias="p_norm"/>
+			<field id="percent_2" dataType="Float" alias="percent_2"/>
+			<field id="lab_comment" dataType="Text" alias="Комментарий"/>
+			<sql/>
+		</model>
+		
+		<model id="LabEntry" parent="ModelSQL" dataTable="lab_entries" virtual="FALSE">
+			<field id="shipment_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" required="TRUE" refTable="shipments" refField="id" alias="Отгрузка"/>
+			<field id="samples" dataType="Text" alias="Подборы"/>
+			<field id="materials" dataType="Text" alias="Материалы"/>
+			<field id="ok2" dataType="Text" alias="OK2"/>
+			<field id="time" dataType="Text" alias="Время"/>
+		</model>
+		<model id="LabEntryList" parent="ModelSQL" dataTable="lab_entry_list_view" virtual="TRUE">
+			<field id="id" dataType="Int"/>
+			<field id="shipment_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="date_time" dataType="DateTime"/>
+			<field id="ship_date_time_descr" dataType="String" alias="Дата"/>			
+			<field id="concrete_type_descr" dataType="String" alias="Марка"/>
+			<field id="concrete_type_id" dataType="Int"/>
+			<field id="ok" dataType="Int"/>
+			<field id="weight" dataType="Int"/>
+			<field id="p7" dataType="String"/>
+			<field id="p28" dataType="String"/>
+			<field id="samples" dataType="Text" alias="Подборы"/>				
+			<field id="materials" dataType="Text" alias="Материалы"/>
+			<field id="client_id" dataType="Int"/>
+			<field id="client_descr" dataType="String" alias="Заказчик"/>
+			<field id="client_phone" dataType="String" alias="Телефон"/>
+			<field id="destination_descr" dataType="String" alias="Объект"/>		
+			<field id="ok2" dataType="Text" alias="ОК2"/>
+			<field id="time" dataType="Text" alias="Время"/>
+			<sql/>
+		</model>
+		<model id="LabEntryDetail" parent="ModelSQL" dataTable="lab_entry_details" virtual="FALSE">
+			<field id="shipment_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" required="TRUE" refTable="shipments" refField="id" alias="Отгрузка"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" required="TRUE"/>				
+			<field id="ok" dataType="Int" alias="ОК"/>
+			<field id="weight" dataType="Int" alias="Масса"/>
+			<field id="kn" dataType="Int" alias="КН"/>				
+			<index id="lab_entry_details_shipment_id_index">
+				<field id="shipment_id"/>
+			</index>						
+		</model>
+		<model id="LabEntryDetailList" parent="ModelSQL" dataTable="lab_entry_detail_list_view" virtual="TRUE">
+			<field id="shipment_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="code" dataType="String"/>
+			<field id="ship_date_time_descr" dataType="String" alias="Дата"/>
+			<field id="concrete_type_descr" dataType="String" alias="Марка"/>
+			<field id="ok" dataType="Int" alias="ОК"/>
+			<field id="weight" dataType="Int" alias="Масса"/>
+			<field id="p7" dataType="Int" alias="П7%"/>
+			<field id="p28" dataType="Int" alias="П28%"/>
+			<field id="p_date_descr" dataType="String" alias="Дата"/>
+			<field id="kn" dataType="Int"/>
+			<field id="mpa" dataType="Int"/>
+			<field id="mpa_avg" dataType="String"/>
+			<field id="pres_norm" dataType="String"/>
+			<sql/>
+		</model>
+		
+		<model id="OrderFromClient" parent="ModelSQL" dataTable="orders_from_clients" virtual="FALSE">
+			<defaultOrder>
+				<field id="id" dir="'DESC'"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date_time" dataType="DateTime"/>
+			<field id="name" dataType="Text"/>
+			<field id="tel" dataType="String" length="15"/>
+			<field id="concrete_type" dataType="String" length="15"/>
+			<field id="dest" dataType="Text"/>
+			<field id="total" dataType="Float" precision="2" length="15"/>
+			<field id="quant" dataType="Float" precision="2" length="15"/>
+			<field id="pump" dataType="Bool" defaultValue="false"/>
+			<field id="comment_text" dataType="Text"/>
+			<field id="closed" dataType="Bool"/>
+			<field id="viewed" dataType="Bool"/>
+			<index id="orders_from_clients_date_time_index">
+				<field id="date_time"/>
+			</index>						
+		</model>		
+		<model id="OrderFromClientList" parent="ModelSQL" dataTable="orders_from_clients_list" virtual="TRUE">
+			<field id="id" dataType="Int" alias="Код"/>
+			<field id="date_time" dataType="DateTime" alias="Дата"/>
+			<field id="date_time_descr" dataType="String" alias="Дата"/>
+			<field id="name" dataType="Text" alias="Клиент"/>
+			<field id="tel" dataType="String" length="15" alias="Телефон"/>
+			<field id="tel_descr" dataType="String" length="15" alias="Телефон"/>
+			<field id="concrete_type" dataType="String" length="15" alias="Марка"/>
+			<field id="dest" dataType="Text" alias="Объект"/>
+			<field id="total" dataType="Float" precision="2" length="15" alias="Сумма"/>
+			<field id="total_descr" dataType="String" alias="Сумма"/>
+			<field id="quant" dataType="Float" precision="2" length="15" alias="Количество"/>
+			<field id="pump" dataType="Bool" defaultValue="false" alias="Есть насос"/>
+			<field id="comment_text" dataType="Text" alias="Комментарий"/>
+		</model>
+		<model id="SupplierOrder" parent="ModelSQL" dataTable="supplier_orders" virtual="FALSE">
+			<field id="date" dataType="Date" primaryKey="TRUE"/>
+			<field id="supplier_id" dataType="Int" primaryKey="TRUE" refTable="suppliers" refField="id"/>
+			<field id="material_id" dataType="Int" primaryKey="TRUE" refTable="raw_materials" refField="id"/>
+			<field id="quant" dataType="Float" precision="3" length="15"/>
+			<field id="vehicles" dataType="Int"/>
+			<field id="sms_id" dataType="Text"/>
+			<field id="sms_confirmed" dataType="Bool"/>
+		</model>		
+		<model id="RawMaterialStoreUserData" parent="ModelSQL" dataTable="raw_materials_store_user_data" virtual="FALSE">
+			<field id="material_id" dataType="Int" primaryKey="TRUE" refTable="raw_materials" refField="id"/>
+			<field id="quant" dataType="Float" precision="3" length="15"/>
+		</model>		
+		<model id="RawMaterialStoreUserDataList" parent="ModelSQL" dataTable="raw_materials_store_user_data_list" virtual="TRUE">
+			<field id="material_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="material_descr" dataType="String"/>
+			<field id="quant" dataType="Float" precision="3" length="15"/>			
+		</model>		
+		<model id="Employee" parent="ModelSQL" dataTable="employees" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE"/>
+			<field id="name" dataType="String" length="80" required="TRUE"/>
+			<field id="employed" dataType="Bool" required="TRUE" defaultValue="TRUE"/>
+			<index id="employees_name_index">
+				<expression>lower(name)</expression>
+			</index>						
+		</model>		
+		<model id="EmployeeWorkTimeSchedule" parent="ModelSQL" dataTable="employee_work_time_schedules" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE"/>
+			<field id="employee_id" dataType="Int" refTable="employees" refField="id" required="TRUE"/>
+			<field id="day" dataType="Date" required="TRUE"/>
+			<field id="hours" dataType="Int" required="TRUE" defaultValue="0"/>
+			<index id="employee_sched_emp_id_index">
+				<field id="employee_id"/>
+			</index>						
+			<index id="employee_sched_day_index">
+				<field id="day"/>
+			</index>									
+		</model>		
+		<model id="EmployeeWorkTimeScheduleList" parent="ModelSQL" dataTable="employee_work_time_schedules_list" virtual="TRUE">
+			<field id="id" dataType="Int" sysCol="TRUE"/>
+			<field id="employee_id" dataType="Int" sysCol="TRUE"/>
+			<field id="employee_descr" dataType="String" alias="Сотрудник"/>
+			<field id="day" dataType="Date" sysCol="TRUE"/>
+			<field id="day_descr" dataType="String" alias="Дата"/>
+			<field id="hours" dataType="Int" alias="Часы"/>
+		</model>		
+
+		<model id="Call" parent="ModelSQL" dataTable="calls" virtual="FALSE">
+			<field id="unique_id" dataType="Text" primaryKey="TRUE"/>
+			<field id="caller_id_num" dataType="String" length="15"/>
+			<field id="ext" dataType="String" length="15"/>
+			<field id="start_time" dataType="DateTime"/>
+			<field id="end_time" dataType="DateTime"/>
+			<field id="client_id" dataType="Int" refTable="clients" refField="id"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id"/>
+			<field id="call_type" dataType="Enum" enumId="call_types"/>
+			<field id="user_id_to" dataType="Int" refTable="users" refField="id"/>
+			<field id="answer_unique_id" dataType="Int"/>
+			<field id="dt" dataType="DateTime"/>
+			<field id="manager_comment" dataType="Text"/>
+			<field id="informed" dataType="Bool"/>
+			<field id="create_date" dataType="String"/>
+			<field id="contact_id" dataType="Int" refTable="contacts" refField="id"/>
+			<field id="contact_detail_id" dataType="Int" refTable="contact_details" refField="id"/>
+		</model>		
+		<model id="CallList" parent="ModelSQL" dataTable="calls_list" virtual="TRUE">
+			<field id="unique_id" dataType="Text" primaryKey="TRUE" sysCol="TRUE"/>
+			<field id="caller_id_num" dataType="String"/>
+			<field id="ext" dataType="String"/>
+			<field id="call_type" dataType="String"/>						
+			
+			<field id="ring_time" dataType="String"/>
+			<field id="answer_time" dataType="String"/>
+			<field id="hangup_time" dataType="String"/>
+			
+			<field id="call_comment" dataType="Text" alias="Комментарий"/>		
+			
+			<field id="client_id" dataType="Int"/>
+			<field id="client_descr" dataType="String"/>
+			<field id="client_type_id" dataType="String"/>
+			<field id="client_type_descr" dataType="String"/>
+			<field id="client_come_from_id" dataType="String"/>
+			<field id="client_come_from_descr" dataType="String"/>			
+			<field id="client_kind" dataType="String"/>
+			
+			<field id="user_id" dataType="Int"/>
+			<field id="user_descr" dataType="Int"/>
+			
+			<field id="concrete_type_id" dataType="Int"/>
+			<field id="concrete_type_descr" dataType="String"/>
+			<field id="quant" dataType="Float"/>
+			<field id="unload_speed" dataType="Float"/>
+			<field id="lang_id" dataType="Int"/>
+			<field id="total" dataType="Float"/>
+			<field id="concrete_price" dataType="Float"/>
+			<field id="destination_price" dataType="Float"/>
+			<field id="destination_id" dataType="Int"/>
+			<field id="destination_descr" dataType="String"/>
+			<field id="unload_price" dataType="Float"/>
+			<field id="pump_vehicle_id" dataType="Int"/>
+			<field id="vh_owner" dataType="String"/>
+			<field id="vh_plate" dataType="String"/>
+		</model>		
+		<model id="CallActive" parent="ModelSQL" dataTable="calls_active" virtual="TRUE">
+			<field id="unique_id" dataType="Text" primaryKey="TRUE"/>			
+			<field id="call_type" dataType="String"/>
+			<field id="ext" dataType="String"/>
+			<field id="caller_id_num" dataType="String"/>
+			<field id="ring_time" dataType="DateTimeTZ"/>
+			<field id="answer_time" dataType="DateTimeTZ"/>
+			<field id="hangup_time" dataType="DateTimeTZ"/>
+			<field id="contact_detail_id" dataType="Int"/>
+			<field id="contact_detail_name" dataType="String"/>
+			<field id="contact_id" dataType="Int"/>
+			<field id="contact_post" dataType="String"/>
+			<field id="contact_last_name" dataType="String"/>
+			<field id="contact_first_name" dataType="String"/>
+			<field id="contact_middle_name" dataType="String"/>
+			<field id="contact_name" dataType="String"/>
+			<field id="contact_description" dataType="String"/>
+			<field id="client_id" dataType="String"/>
+			<field id="client_descr" dataType="String"/>
+		</model>		
+		
+		<model id="UserMacAddress" parent="ModelSQL" dataTable="user_mac_addresses" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id"/>
+			<field id="mac_address" dataType="String" length="17" required="TRUE"/>
+			<index id="user_mac_addresses_user_index">
+				<field id="user_id"/>
+			</index>									
+			<index id="user_mac_addresses_mac_address_index" unique="TRUE">
+				<field id="mac_address"/>
+			</index>									
+		</model>		
+		<model id="UserMacAddressList" parent="ModelSQL" dataTable="user_mac_addresses_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="user_id" dataType="Int"/>
+			<field id="user_descr" dataType="String"/>
+			<field id="mac_address" dataType="String" length="17" required="TRUE"/>
+		</model>		
+		<model id="ClientTel" parent="ModelSQL" dataTable="client_tels" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="client_id" dataType="Int" refTable="clients" refField="id"/>
+			<field id="name" dataType="Text" alias="ФИО"/>
+			<field id="tel" dataType="String" length="15" required="TRUE" alias="Телефон"/>
+			<field id="email" dataType="String" required="FALSE" length="50" alias="Эл.почта"/>
+			<field id="post" dataType="String" required="FALSE" length="50" alias="Должность"/>
+			<index id="client_tels_index" unique="TRUE">
+				<field id="client_id"/>
+				<field id="tel"/>
+			</index>												
+			<index id="client_tels_tel">
+				<field id="tel"/>
+			</index>															
+		</model>		
+		<model id="ClientType" parent="ModelSQL" dataTable="client_types" virtual="FALSE">
+			<defaultOrder>
+				<field id="id"/>
+			</defaultOrder>		
+			<field id="id" primaryKey="TRUE" dataType="Int" autoInc="TRUE"/>
+			<field id="name" dataType="String" length="100"/>
+		</model>
+		<model id="ClientComeFrom" parent="ModelSQL" dataTable="client_come_from" virtual="FALSE">
+			<defaultOrder>
+				<field id="id"/>
+			</defaultOrder>		
+			<field id="id" primaryKey="TRUE" dataType="Int" autoInc="TRUE"/>
+			<field id="name" dataType="String" length="100"/>
+		</model>		
+		<model id="ClientDebt" parent="ModelSQL" dataTable="client_debts" virtual="FALSE">
+			<field id="client_id" primaryKey="TRUE" dataType="Int" refTable="clients" refField="id"/>
+			<field id="debt" dataType="Float" length="15" precision="2"/>
+		</model>			
+		
+		<model id="Quarry" parent="ModelSQL" dataTable="quarries" virtual="FALSE">
+			<defaultOrder>
+				<field id="name"/>
+			</defaultOrder>				
+			<field id="id" primaryKey="TRUE" dataType="Int" autoInc="TRUE"/>
+			<field id="name" dataType="String" length="50" precision="2"/>
+			<index id="quarries_name" unique="FALSE">
+				<field id="name"/>
+			</index>
+		</model>			
+		<model id="SandQuarryVal" parent="ModelSQL" dataTable="sand_quarry_vals" virtual="FALSE">
+			<defaultOrder>
+				<field id="day"/>
+			</defaultOrder>				
+			<field id="id" primaryKey="TRUE" dataType="Int" autoInc="TRUE"/>
+			<field id="day" dataType="Date"/>
+			<field id="quarry_id" dataType="Int" refTable="quarries" refField="id"/>
+			<field id="v_mkr" dataType="Float" length="15" precision="2"/>
+			<field id="v_2_5" dataType="Float" length="15" precision="2"/>
+			<field id="v_1_25" dataType="Float" length="15" precision="2"/>
+			<field id="v_0_63" dataType="Float" length="15" precision="2"/>
+			<field id="v_0_63_2" dataType="Float" length="15" precision="2"/>
+			<field id="v_0_315" dataType="Float" length="15" precision="2"/>
+			<field id="v_0_16" dataType="Float" length="15" precision="2"/>
+			<field id="v_0_05" dataType="Float" length="15" precision="2"/>
+			<field id="v_nasip" dataType="Float" length="15" precision="2"/>
+			<field id="v_dno" dataType="Float" length="15" precision="2"/>
+			<field id="v_istin" dataType="Float" length="15" precision="2"/>
+			<field id="v_humid" dataType="Float" length="15" precision="2"/>
+			<field id="v_dust" dataType="Float" length="15" precision="2"/>
+			<field id="v_void" dataType="Float" length="15" precision="2"/>
+			<field id="v_comment" dataType="Text"/>
+			<index id="sand_quarry_vals_day" unique="FALSE">
+				<field id="day"/>
+			</index>									
+			<index id="sand_quarry_vals_quarry_id" unique="FALSE">
+				<field id="quarry_id"/>
+			</index>												
+		</model>			
+		<model id="SandQuarryValList" parent="ModelSQL" dataTable="sand_quarry_vals_list" virtual="TRUE">
+			<field id="id" primaryKey="TRUE" dataType="Int"/>
+			<field id="day" dataType="Date"/>
+			<field id="day_descr" dataType="String"/>
+			<field id="quarry_id" dataType="Int"/>
+			<field id="quarry_descr" dataType="String"/>
+			<field id="v_mkr" dataType="Float" length="15" precision="2"/>
+			<field id="v_2_5" dataType="Float" length="15" precision="2"/>
+			<field id="v_1_25" dataType="Float" length="15" precision="2"/>
+			<field id="v_0_63" dataType="Float" length="15" precision="2"/>
+			<field id="v_0_16" dataType="Float" length="15" precision="2"/>
+			<field id="v_0_05" dataType="Float" length="15" precision="2"/>			
+			<field id="v_nasip" dataType="Float" length="15" precision="2"/>
+			<field id="v_istin" dataType="Float" length="15" precision="2"/>
+			<field id="v_humid" dataType="Float" length="15" precision="2"/>
+			<field id="v_dust" dataType="Float" length="15" precision="2"/>
+			<field id="v_void" dataType="Float" length="15" precision="2"/>
+			<field id="v_comment" dataType="Text"/>
+		</model>			
+		<model id="StoneQuarryVal" parent="ModelSQL" dataTable="stone_quarry_vals" virtual="FALSE">
+			<defaultOrder>
+				<field id="day"/>
+			</defaultOrder>				
+			<field id="id" primaryKey="TRUE" dataType="Int" autoInc="TRUE"/>
+			<field id="day" dataType="Date"/>
+			<field id="quarry_id" dataType="Int" refTable="quarries" refField="id"/>
+			<field id="v_nasip" dataType="Float" length="15" precision="2"/>
+			<field id="v_istin" dataType="Float" length="15" precision="2"/>
+			<field id="v_dust" dataType="Float" length="15" precision="2"/>
+			<field id="v_humid" dataType="Float" length="15" precision="2"/>
+			<field id="v_void" dataType="Float" length="15" precision="2"/>
+			<field id="v_comment" dataType="Text"/>
+			<index id="stone_quarry_vals_day" unique="FALSE">
+				<field id="day"/>
+			</index>									
+			<index id="stone_quarry_vals_quarry_id" unique="FALSE">
+				<field id="quarry_id"/>
+			</index>												
+		</model>			
+		<model id="StoneQuarryValList" parent="ModelSQL" dataTable="stone_quarry_vals_list" virtual="TRUE">
+			<field id="id" primaryKey="TRUE" dataType="Int"/>
+			<field id="day" dataType="Date"/>
+			<field id="day_descr" dataType="String"/>
+			<field id="quarry_id" dataType="Int"/>
+			<field id="quarry_descr" dataType="String"/>
+			<field id="v_nasip" dataType="Float" length="15" precision="2"/>
+			<field id="v_istin" dataType="Float" length="15" precision="2"/>
+			<field id="v_dust" dataType="Float" length="15" precision="2"/>
+			<field id="v_humid" dataType="Float" length="15" precision="2"/>
+			<field id="v_void" dataType="Float" length="15" precision="2"/>
+			<field id="v_comment" dataType="Text"/>
+		</model>			
+		<model id="MaterialObnul" parent="ModelSQL" dataTable="materials_obnuls" virtual="FALSE">
+			<defaultOrder>
+				<field id="day"/>
+			</defaultOrder>				
+			<field id="day" dataType="Date" primaryKey="TRUE"/>
+			<field id="material_id" dataType="Int" refTable="raw_materials" refField="id" primaryKey="TRUE"/>
+			<field id="quant" dataType="Float" length="19" precision="3"/>
+		</model>			
+		<model id="SpecialistRequest" parent="ModelSQL" dataTable="specialist_requests" virtual="FALSE">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>				
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date_time" dataType="DateTime"/>
+			<field id="name" dataType="Text"/>
+			<field id="comment" dataType="Text"/>
+			<field id="tel" dataType="Text"/>
+			<field id="viewed" dataType="Bool" defaultValue="FALSE"/>
+			<field id="client_id" dataType="Int" refTable="clients" refField="id"/>
+			<field id="manager_comment" dataType="Text"/>
+			
+			<index id="specialist_requests_date_time" unique="FALSE">
+				<field id="date_time"/>
+			</index>															
+		</model>			
+		<model id="SpecialistRequestList" parent="ModelSQL" dataTable="specialist_requests_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Номер"/>
+			<field id="date_time" dataType="DateTime" sysCol="TRUE"/>
+			<field id="date_time_descr" dataType="DateTime"/>
+			<field id="name" dataType="Text" alias="ФИО"/>
+			<field id="comment" dataType="Text" alias="Комментарий"/>
+			<field id="tel" dataType="Text" alias="Телефон"/>
+			<field id="client_id" dataType="Int" sysCol="TRUE"/>
+			<field id="client_descr" dataType="String" alias="Клиент"/>
+		</model>			
+		<model id="SiteFeedBack" parent="ModelSQL" dataTable="site_feedbacks" virtual="FALSE">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>				
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date_time" dataType="DateTime"/>
+			<field id="name" dataType="Text"/>
+			<field id="comment" dataType="Text"/>
+			<field id="email" dataType="Text"/>
+			<field id="viewed" dataType="Bool" defaultValue="FALSE"/>
+			<index id="site_feed_backs_date_time" unique="FALSE">
+				<field id="date_time"/>
+			</index>															
+		</model>			
+		<model id="SiteFeedBackList" parent="ModelSQL" dataTable="site_feedbacks_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alis="Код"/>
+			<field id="date_time" dataType="DateTime" sysCol="TRUE"/>
+			<field id="date_time_descr" dataType="String" alias="Дата"/>
+			<field id="name" dataType="Text" alias="ФИО"/>
+			<field id="comment" dataType="Text" alias="Комментарий"/>
+			<field id="email" dataType="Text" alias="Email"/>
+			<field id="viewed" dataType="Bool" sysCol="TRUE"/>
+			<field id="viewed_descr" dataType="String" alias="Просмотрено"/>
+		</model>			
+		
+		<model id="CarTrackingMalfucntion" parent="ModelSQL" dataTable="car_tracking_malfucntions" virtual="FALSE">
+			<defaultOrder>
+				<field id="dt"/>
+			</defaultOrder>				
+			<field id="dt" dataType="Date" primaryKey="TRUE"/>
+			<field id="tel" dataType="String" length="15" primaryKey="TRUE"/>
+			<field id="tracker_id" dataType="String" length="15" primaryKey="TRUE"/>
+		</model>			
+		<model id="MailForSending" parent="ModelSQL" dataTable="mail_for_sending" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" required="TRUE" autoInc="TRUE"/>
+			<field id="date_time" dataType="DateTime" defaultValue="current_timestamp"/>
+			<field id="from_addr" dataType="String" length="50"/>
+			<field id="from_name" dataType="String" length="255"/>
+			<field id="to_addr" dataType="String" length="50"/>
+			<field id="to_name" dataType="String" length="255"/>
+			<field id="reply_addr" dataType="String" length="50"/>
+			<field id="reply_name" dataType="String" length="255"/>
+			<field id="body" dataType="Text"/>
+			<field id="sender_addr" dataType="String" length="50"/>
+			<field id="subject" dataType="String" length="255"/>
+			<field id="sent" dataType="Bool" defaultValue="false"/>
+			<field id="sent_date_time" dataType="DateTime"/>
+			<field id="email_type" dataType="Enum" enumId="email_types"/>
+			<index id="mail_for_sending_date_time_index" unique="FALSE">
+				<field id="date_time"/>
+			</index>													
+			<index id="mail_for_sending_sent_index" unique="FALSE">
+				<field id="sent"/>
+			</index>																
+		</model>
+		<model id="MailForSendingAttachment" parent="ModelSQL" dataTable="mail_for_sending_attachments" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE"/>
+			<field id="mail_for_sending_id" dataType="Int" refTable="mail_for_sending" refField="id"/>
+			<field id="file_name" dataType="String" length="255"/>
+			<index id="mail_for_sending_attachments_id_index" unique="FALSE">
+				<field id="mail_for_sending_id"/>
+			</index>																
+		</model>
+		<model id="SMSForSending" parent="ModelSQL" dataTable="sms_for_sending" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" required="TRUE" autoInc="TRUE"/>
+			<field id="tel" dataType="String" length="15"/>
+			<field id="body" dataType="Text"/>
+			<field id="date_time" dataType="DateTime" defaultValue="current_timestamp"/>
+			<field id="sent" dataType="Bool" defaultValue="FALSE"/>
+			<field id="sent_date_time" dataType="DateTime"/>
+			<field id="delivered" dataType="Bool" defaultValue="FALSE"/>
+			<field id="delivered_date_time" dataType="DateTime"/>
+			<field id="sms_type" dataType="Enum" enumId="sms_types"/>
+			<field id="sms_id" dataType="Text"/>
+			<index id="sms_for_sending_sent_index" unique="FALSE">
+				<field id="sent"/>
+				<field id="delivered"/>
+			</index>													
+			<index id="sms_for_sending_date_time_idx" unique="FALSE">
+				<field id="date_time"/>
+			</index>																
+		</model>
+		<model id="EmailTemplate" parent="ModelSQL" dataTable="email_templates" virtual="FALSE">
+			<defaultOrder>
+				<field id="email_type"/>
+			</defaultOrder>		
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
+			<field id="email_type" dataType="Enum" primaryKey="FALSE" enumId="email_types" autoInc="FALSE" required="TRUE" alias="Тип email"/>
+			<field id="template" dataType="Text" required="TRUE" alias="Шаблон"/>
+			<field id="comment_text" dataType="Text" required="TRUE" alias="Комментарий"/>
+			<field id="mes_subject" dataType="Text" required="TRUE" alias="Тема"/>
+			<field id="fields" dataType="Text" required="TRUE" alias="Поля"/>
+			<index id="email_templates_type_index" unique="TRUE">
+				<field id="email_type"/>
+			</index>			
+		</model>
+		
+		<model id="EmailTemplateList" parent="ModelSQL" dataTable="email_templates_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="email_type" dataType="String"/>
+			<field id="email_type_descr" dataType="String"/>
+			<field id="template" dataType="Text"/>
+			<field id="fields" dataType="Text"/>
+		</model>		
+		<model id="ClientValidDuplicate" parent="ModelSQL" dataTable="client_valid_duplicates" virtual="FALSE">
+			<field id="client_id" dataType="Int" refTable="clients" refField="id" primaryKey="TRUE"/>
+			<field id="tel" dataType="String" length="15" primaryKey="TRUE"/>
+			<index id="client_valid_duplicates_client_tel" unique="TRUE">
+				<field id="client_id"/>
+				<field id="tel"/>
+			</index>						
+			<index id="client_valid_duplicates_tel">
+				<field id="tel"/>
+			</index>			
+			
+		</model>
+		<model id="ClientValidDuplicateList" parent="ModelSQL" dataTable="client_valid_duplicates_list" virtual="TRUE">
+			<field id="client_id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
+			<field id="tel" dataType="String" primaryKey="TRUE" alias="Телефон"/>
+			<field id="client_descr" dataType="String" alias="Клиент"/>
+		</model>
+
+		<model id="ShipmentTimeNorm" parent="ModelSQL" dataTable="shipment_time_norms" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" required="TRUE" alias="Объем"/>
+			<field id="norm_min" dataType="Int" required="TRUE" alias="Норма минут"/>
+		</model>
+
+		<model id="ConcretePrice" parent="ModelSQL" dataTable="concrete_prices" virtual="FALSE">
+			<field id="concrete_type_id" dataType="Int" required="TRUE" refTable="concrete_types" refField="id" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="date_time" dataType="DateTime" required="TRUE" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="price" dataType="Float" length="15" precision="2"/>
+		</model>		
+
+		<model id="PlantLoadChart" parent="ModelSQL" dataTable="widget_plant_load_charts" virtual="FALSE">
+			<field id="date_time_from" dataType="DateTime" required="TRUE" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="date_time_to" dataType="DateTime" required="TRUE" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="times" dataType="Text"/>
+			<field id="orders" dataType="Text"/>
+			<field id="shipments" dataType="Text"/>
+			<field id="norms" dataType="Text"/>
+			<field id="veh_counts" dataType="Text"/>
+			<field id="state" dataType="Int"/>
+		</model>		
+		<model id="UIStorage" parent="ModelSQL" dataTable="ui_storages" virtual="FALSE">
+			<field id="ui_id" dataType="String" length="50" primaryKey="TRUE"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" primaryKey="TRUE"/>
+			<field id="data" dataType="Text"/>
+		</model>		
+		<model id="UIStorageList" parent="ModelSQL" virtual="TRUE">
+			<field id="ui_id" dataType="String"/>
+			<field id="data" dataType="Text"/>
+		</model>		
+		<model id="OrderForOperatorQueue" parent="ModelSQL" dataTable="order_for_operator_queue" virtual="FALSE">
+			<field id="shipment_id" dataType="Int" refTable="shipments" refField="id" primaryKey="TRUE"/>
+			<field id="date_time" dataType="DateTime"/>
+			<index id="order_for_operator_queue_date_time_idx">
+				<field id="date_time"/>
+			</index>						
+		</model>				
+		<model id="ShipmentOnLoad" parent="ModelSQL" dataTable="shipment_on_load" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="order_id" dataType="Int" alias="ID заявки"/>
+			<field id="order_number" dataType="String" alias="Номер заявки"/>
+			<field id="order_quant" dataType="Float" alias="Количество заявки"/>
+			<field id="vehicle_schedule_id" dataType="Int" alias="ID расписания"/>
+			<field id="ship_date_time" dataType="DateTimeTZ" alias="Дата-время отгрузки"/>
+			<field id="date_time" dataType="DateTimeTZ" alias="Дата-время назначения"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="cost" dataType="Float" alias="Стоимость"/>
+			<field id="shipped" dataType="Bool" alias="Отгружен"/>
+			<field id="concrete_type_id" dataType="Int" alias="ID марки"/>
+			<field id="concrete_type_descr" dataType="String" alias="Представление марки"/>
+			<field id="vh_client_id" dataType="Int" alias="ID владельца ТС"/>
+			<field id="vh_client_descr" dataType="String" alias="Представление владельца ТС"/>
+			<field id="vh_plate" dataType="String" alias="Гос.номер ТС"/>
+			<field id="driver_id" dataType="Int" alias="ID водителя"/>
+			<field id="driver_descr" dataType="String" alias="Прелставление водителя"/>
+			<field id="destination_id" dataType="Int" alias="Объект"/>
+			<field id="destination_descr" dataType="String" alias="Объект"/>
+			<field id="client_id" dataType="Int" alias="ID клиента"/>
+			<field id="client_descr" dataType="String" alias="Представление клиента"/>
+			<field id="demurrage_cost" dataType="Float" alias="Стоимость простоя"/>
+			<field id="user_id" dataType="Int" alias="ID пользователя"/>
+			<field id="user_descr" dataType="String" alias="Представление пользователя"/>
+		</model>						
+		<model id="ShippedOrderList" parent="ModelSQL" dataTable="shipment_on_load" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="order_id" dataType="Int" alias="ID заявки"/>
+			<field id="order_number" dataType="String" alias="Номер заявки"/>
+			<field id="order_quant" dataType="Float" alias="Количество заявки"/>
+			<field id="vehicle_schedule_id" dataType="Int" alias="ID расписания"/>
+			<field id="ship_date_time" dataType="DateTimeTZ" alias="Дата-время отгрузки"/>
+			<field id="date_time" dataType="DateTimeTZ" alias="Дата-время назначения"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="cost" dataType="Float" alias="Стоимость"/>
+			<field id="shipped" dataType="Bool" alias="Отгружен"/>
+			<field id="concrete_type_id" dataType="Int" alias="ID марки"/>
+			<field id="concrete_type_descr" dataType="String" alias="Представление марки"/>
+			<field id="vh_client_id" dataType="Int" alias="ID владельца ТС"/>
+			<field id="vh_client_descr" dataType="String" alias="Представление владельца ТС"/>
+			<field id="vh_plate" dataType="String" alias="Гос.номер ТС"/>
+			<field id="driver_id" dataType="Int" alias="ID водителя"/>
+			<field id="driver_descr" dataType="String" alias="Прелставление водителя"/>
+			<field id="destination_id" dataType="Int" alias="Объект"/>
+			<field id="destination_descr" dataType="String" alias="Объект"/>
+			<field id="client_id" dataType="Int" alias="ID клиента"/>
+			<field id="client_descr" dataType="String" alias="Представление клиента"/>
+			<field id="demurrage_cost" dataType="Float" alias="Стоимость простоя"/>
+			<field id="user_id" dataType="Int" alias="ID пользователя"/>
+			<field id="user_descr" dataType="String" alias="Представление пользователя"/>
+		</model>						
+		<model id="AssignedOrderList" parent="ModelSQL" dataTable="shipment_on_load" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+			<field id="order_id" dataType="Int" alias="ID заявки"/>
+			<field id="order_number" dataType="String" alias="Номер заявки"/>
+			<field id="order_quant" dataType="Float" alias="Количество заявки"/>
+			<field id="vehicle_schedule_id" dataType="Int" alias="ID расписания"/>
+			<field id="ship_date_time" dataType="DateTimeTZ" alias="Дата-время отгрузки"/>
+			<field id="date_time" dataType="DateTimeTZ" alias="Дата-время назначения"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="cost" dataType="Float" alias="Стоимость"/>
+			<field id="shipped" dataType="Bool" alias="Отгружен"/>
+			<field id="concrete_type_id" dataType="Int" alias="ID марки"/>
+			<field id="concrete_type_descr" dataType="String" alias="Представление марки"/>
+			<field id="vh_client_id" dataType="Int" alias="ID владельца ТС"/>
+			<field id="vh_client_descr" dataType="String" alias="Представление владельца ТС"/>
+			<field id="vh_plate" dataType="String" alias="Гос.номер ТС"/>
+			<field id="driver_id" dataType="Int" alias="ID водителя"/>
+			<field id="driver_descr" dataType="String" alias="Прелставление водителя"/>
+			<field id="destination_id" dataType="Int" alias="Объект"/>
+			<field id="destination_descr" dataType="String" alias="Объект"/>
+			<field id="client_id" dataType="Int" alias="ID клиента"/>
+			<field id="client_descr" dataType="String" alias="Представление клиента"/>
+			<field id="demurrage_cost" dataType="Float" alias="Стоимость простоя"/>
+			<field id="user_id" dataType="Int" alias="ID пользователя"/>
+			<field id="user_descr" dataType="String" alias="Представление пользователя"/>
+		</model>						
+		
+		<model id="ZoneList" parent="ModelSQL" virtual="TRUE" retModel="TRUE">
+			<field id="vehicle_id" dataType="Int" descr="ID ТС"/>
+			<field id="destination_id" dataType="Int" descr="ID объекта"/>
+			<field id="destination_descr" dataType="String" descr="Представление объекта."/>
+			<field id="zone_str" dataType="String" descr="Список координат геозоны в формате lon lat.Разделитель пар - запятая. Разделитель одной пары - пробел."/>
+			<field id="zone_center_str" dataType="String" descr="Координаты центра геозоны в формате lon lat.Разделитель - пробел."/>
+			<field id="is_base" dataType="Bool" descr="Признак зоны завода."/>			
+		</model>				
+		<model id="GPSDataAll" parent="ModelSQL" virtual="TRUE" retModel="TRUE">
+			<descr>Отображает состояние ТС от трэкера</descr>
+			<field id="vehicle_id" dataType="Int" descr="ID ТС"/>
+			<field id="vehicle_plate" dataType="String" descr="Гос. номер ТС"/>
+			<field id="vehicle_owner" dataType="String" descr="владелец ТС"/>
+			<field id="vehicle_make" dataType="String" descr="марка ТС"/>
+			<field id="period" dataType="String" descr="Дата получения координат трэкером."/>
+			<field id="lon_str" dataType="String" descr="Долгота в текстовом формате NMEA"/>
+			<field id="lat_str" dataType="String" descr="Широта в текстовом формате NMEA"/>
+			<field id="speed" dataType="DateTimeTZ" descr="Скорость ТС"/>
+			<field id="ns" dataType="String" descr="Направление движения ТС n/s - север/юг"/>
+			<field id="ew" dataType="String" descr="Направление движения ТС e/w - восток/запад"/>
+			<field id="received_dt" dataType="DateTimeTZ" descr="Дата получения данных на сервере."/>
+			<field id="odometer" dataType="Int" descr="Киллометраж ТС."/>
+			<field id="engine_on" dataType="Bool" descr="Флаг включенного зажигания."/>
+			<field id="voltage" dataType="Float" descr="Напряжение аккумулятора."/>
+			<field id="heading" dataType="Float" descr="Направление движения ТС в градусах."/>
+			<field id="lon" dataType="Float" descr="Широта в градусах."/>
+			<field id="lat" dataType="Float" descr="Долгота в градусах."/>
+		</model>				
+		<model id="GPSData" parent="ModelSQL" virtual="TRUE" retModel="TRUE">
+			<descr>Отображает состояние ТС от трэкера + информация по активной для ТС заявке</descr>
+			<field id="vehicle_id" dataType="Int" descr="ID ТС"/>
+			<field id="vehicle_plate" dataType="String" descr="Гос. номер ТС"/>
+			<field id="vehicle_owner" dataType="String" descr="владелец ТС"/>
+			<field id="vehicle_make" dataType="String" descr="марка ТС"/>
+			<field id="period" dataType="String" descr="Дата получения координат трэкером."/>
+			<field id="lon_str" dataType="String" descr="Долгота в текстовом формате NMEA"/>
+			<field id="lat_str" dataType="String" descr="Широта в текстовом формате NMEA"/>
+			<field id="speed" dataType="DateTimeTZ" descr="Скорость ТС"/>
+			<field id="ns" dataType="String" descr="Направление движения ТС n/s - север/юг"/>
+			<field id="ew" dataType="String" descr="Направление движения ТС e/w - восток/запад"/>
+			<field id="received_dt" dataType="DateTimeTZ" descr="Дата получения данных на сервере."/>
+			<field id="odometer" dataType="Int" descr="Киллометраж ТС."/>
+			<field id="engine_on" dataType="Bool" descr="Флаг включенного зажигания."/>
+			<field id="voltage" dataType="Float" descr="Напряжение аккумулятора."/>
+			<field id="heading" dataType="Float" descr="Направление движения ТС в градусах."/>
+			<field id="lon" dataType="Float" descr="Широта в градусах."/>
+			<field id="lat" dataType="Float" descr="Долгота в градусах."/>
+			<!-- -->
+			<field id="driver_id" dataType="Int" descr="ID водителя"/>
+			<field id="driver_descr" dataType="Int" descr="Представление водителя"/>
+			<field id="driver_tel" dataType="Int" descr="Мобильный телефон водителя"/>
+			<field id="shipment_id" dataType="Int" descr="ID отгрузки"/>
+			<field id="ship_date_time" dataType="DateTimeTZ" descr="Дата время отгрузки"/>
+			<field id="ship_quant" dataType="Float" descr="Объем кубов отгрузки"/>
+			<field id="order_quant" dataType="Float" descr="Объем кубов заявки"/>
+			<field id="concrete_type_id" dataType="Float" descr="ID марки бетона"/>
+			<field id="concrete_type_descr" dataType="String" descr="Представление марки бетона"/>
+			<field id="order_total" dataType="Float" descr="Общая сумма заявки"/>
+			<field id="order_payed" dataType="Bool" descr="Признак заявки - оплачена"/>
+			<field id="order_under_control" dataType="Bool" descr="Признак заявки - на контролем"/>
+			<field id="order_pay_cash" dataType="Bool" descr="Признак заявки - за нал"/>
+			<field id="order_number" dataType="Bool" descr="Номер заявки"/>
+			<field id="order_user_id" dataType="Int" descr="ID пользователя-автора заявки"/>
+			<field id="order_user_descr" dataType="Int" descr="Представление пользователя-автора заявки"/>			
+			<field id="destination_id" dataType="Int" descr="ID объекта"/>
+			<field id="vehicle_tracker_id" dataType="String" descr="ID трэкера"/>
+			<field id="state" dataType="String" descr="Статус ТС"/>
+		</model>				
+		<model id="DefCallReply" parent="ModelSQL" dataTable="def_call_replies" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" required="TRUE"/>
+			<field id="value" dataType="Text"/>
+		</model>				
+		<model id="ContactDetailFullList" parent="ModelSQL" dataTable="contact_detail_full_list" virtual="TRUE">
+			<field id="head_type" dataType="String" descr="Тип 'шапки' контактной информации (контакт,клиент)"/>
+			<field id="contact_id" dataType="Int" descr="ID контакта (для контрагента NULL)"/>
+			<field id="client_id" dataType="Int" descr="ID контрагента (для контакта NULL)"/>
+			<field id="contact_detail_id" dataType="Int" descr="ID контактной информации"/>
+			<field id="name" dataType="String" descr="Наименование (ФИО для контакта, наименование для клиента)"/>
+			<field id="contact_detail_type" dataType="Enum" enumId="contact_types" descr="Тип контактной информации"/>
+			<field id="contact_detail_name" dataType="String" descr="Наименование контактной информации"/>
+			<field id="contact_detail_value" dataType="String" descr="Значение контактной информации"/>
+			<field id="contact_description" dataType="String" descr="Комментарий (description для контакта, ХХ для контрагента)"/>
+		</model>				
+		
+		<model id="OrderLog" parent="ModelSQL" dataTable="order_log" virtual="FALSE">
+			<field id="order_id" dataType="Int" refTable="orders" refField="id" primaryKey="TRUE" descr="ID заявки"/>
+			<field id="date_time" dataType="DateTimeTZ" primaryKey="TRUE" descr="Дата-время события"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" descr="ID пользрвателя"/>
+			<field id="order_event" dataType="Enum" enumId="order_events" descr="событие"/>
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+		</model>				
+		<model id="OrderHistory" parent="ModelSQL" virtual="TRUE">
+			<field id="order_id" dataType="Int" descr="ID заявки"/>
+			<field id="date_time" dataType="DateTimeTZ" descr="Дата-время события"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" descr="ID пользователя"/>
+			<field id="user_descr" dataType="String" descr="Представление пользователя"/>
+			<field id="order_event" dataType="String" descr="событие"/>
+		</model>						
+	</models>
+	<constants>
+		<constant id="shift_start" name="Время начало смены" descr="" dataType="TimeTZ" defaultValue="07:00"/>
+		<constant id="shift_length" name="Длительность смены" descr="Продолжительность смены" dataType="Interval" defaultValue="24:00"/>		
+		<constant id="shift_length_for_stat" name="Длительность смены для сбора статистики" descr="Продолжительность смены для расчета различных показателей" dataType="Interval" defaultValue="13:00"/>
+		<constant id="order_awaiting_state" name="Интервал для статуса ожидает" descr="" dataType="Interval" defaultValue="00:15"/>
+		<constant id="order_mark_if_no_ship" name="Выделение цветом заявок при отсутствии отгрузок более данного времени" descr="Если не было отгрузок более данного времени, то заявка будет подсвечена" dataType="Interval" defaultValue="01:00"/>
+		<constant id="base_geo_zone" name="Зона завода" descr="" dataType="Int" refTable="destinations" refField="id" defaultValue="0"/>
+		<constant id="map_default_coords" name="Координаты для позиционирования карты по умолчанию" descr="Задает географическую долготу/широту" dataType="String" length="35"/>
+		<constant id="demurrage_cost_per_hour" name="Стоимость часа простоя (руб.)" descr="" dataType="Float" length="15" precision="2" defaultValue="500"/>
+		<constant id="min_demurrage_time" name="Минимальное время простоя" descr="Минимальное значение времени за которое считается простой" dataType="Interval" defaultValue="00:05"/>
+		<constant id="no_tracker_signal_warn_interval" name="Интервал, по истечении которого выводится сообщение о неисправном трекере" descr="" dataType="Time" defaultValue="01:00"/>		
+		<constant id="vehicle_unload_time" name="Время разгрузки автомобиля" descr="Используется для расчета времени возврата автомобиля" dataType="Time" defaultValue="01:00"/>
+		
+		<!-- -->
+		<constant id="backup_vehicles_feature" name="Свойство - запасные автомобили" descr="Автомобили с таким значением свойств являются запасными" dataType="String" length="20" defaultValue="запас"/>
+		<constant id="base_geo_zone_id" name="Код зоны завода" descr="" dataType="Int" defaultValue="0"/>
+		
+		<constant id="chart_step_min" name="Шаг для графика (минут)" descr="Определяет значение в минутах с каким шагом отрисовывать график" dataType="Int" defaultValue="60"/>
+		<constant id="day_shift_length" name="Интервал дневной смены" descr="Используется для расчета разных значений, например 13 часов, если день считается с 7-00 до 20-00" dataType="Time" defaultValue="13:00"/>
+		<constant id="days_allowed_with_broken_tracker" name="Сколько дней будет разрешена отгрузка со сломанным трэкером" descr="" dataType="Int" defaultValue="5"/>
+		<constant id="def_order_unload_speed" name="Скорость разгрузки (куб/час)" descr="Для подстановки в заявку по умолчанию" dataType="Int" defaultValue="15"/>
+		
+		<constant id="first_shift_start_time" name="Время начало первой смены" descr="" dataType="Time" defaultValue="07:00"/>		
+		<constant id="geo_zone_check_points_count" name="Количество точек с терминала для проверки вхождения в зону" descr="Задает количество точек с данными (долгота и широта) для проверки вхождения автомобиля в геозону" dataType="Int" defaultValue="3"/>
+		<constant id="map_default_lat" name="Широта для позиционирования карты по умолчанию" descr="Задает географическую широту в формате хххх.хххх" dataType="String" length="9" defaultValue="5708.2928"/>
+		<constant id="map_default_lon" name="Долгота для позиционирования карты по умолчанию" descr="Задает географическую широту в формате ххххх.хххх" dataType="String" length="10" defaultValue="06533.0345"/>
+		<constant id="max_hour_load" name="Максимальная загрузка завода (куб/час)" descr="" dataType="Int" defaultValue="40"/>
+		<constant id="max_vehicle_at_work" name="Максимальное количество автомобилей на линии" descr="" dataType="Int" defaultValue="20"/>		
+		<constant id="min_quant_for_ship_coast" name="Минимальный объем (м3) для расчета цены доставки" descr="" dataType="Int" defaultValue="5"/>
+		
+		<constant id="order_auto_place_tolerance" name="Погрешность для автоматического размещения заявок (м3)" descr="" dataType="Int" defaultValue="10"/>
+		<constant id="order_step_min" name="Шаг между заявками" descr="Шаг в минутах между заявками" dataType="Int" defaultValue="30"/>
+		<constant id="own_vehicles_feature" name="Значение свойства свои автомобили" descr="Автомобили с тавим значением свойства считаются своими" dataType="String" length="20" defaultValue="основ"/>
+		<constant id="raw_mater_plcons_rep_def_days" name="Отчет плановое потребление,дни" descr="Значение дней по умолчанию для отчета" dataType="Int" defaultValue="7"/>
+		<constant id="self_ship_dest_id" name="Код объекта самовывоз" descr="" dataType="Int" defaultValue="0"/>
+		<constant id="self_ship_dest" name="Объект самовывоз" descr="" dataType="Int" refTable="destinations" refField="id" defaultValue="0"/>
+		<constant id="shift_for_orders_length_time" name="Длительность смены для заявок" descr="" dataType="Time" defaultValue="17:00"/>
+		
+		<constant id="ship_coast_for_self_ship_destination" name="Стоимость доставки (руб.) для объекта самовывоз" descr="" dataType="Float" length="15" precision="2" defaultValue="3500"/>
+		<constant id="speed_change_for_order_autolocate" name="Уровень изменения скорости (%) при автоматическом подборе времени для заявки" descr="" dataType="Int" defaultValue="10"/>
+		<constant id="tracker_service_cel_phone" name="Телефон для отправки сообщений при неисправных терминалах" descr="" dataType="String" length="15" defaultValue="8-900-000-00-00"/>
+		
+		<constant id="grid_rows_per_page_count" name="Количество строк в таблицах на одной странице" descr="Все таблицы с большим количеством строк будут разбиты на страницы с данным количество строк." dataType="Int" defaultValue="150"/>
+		<constant id="avg_mat_cons_dev_day_count" name="Количество дней для расчета среднего отлонения расхода материалов от нормы" descr="Среднее отклонение расхода материалов от нормы расчитывается автоматически за данное количество дней." dataType="Int" defaultValue="10"/>
+		<constant id="days_for_plan_procur" name="Количество дней для расчета плановых остатков" descr="Данное количество дней используется при расчете средних показателей (отгрузка бетона,расход материалов) при планировании закупок" dataType="Int" defaultValue="10"/>
+		<constant id="lab_min_sample_count" name="Минимальное количество отборов для лаборатории" descr="" dataType="Int" defaultValue="0"/>
+		<constant id="lab_days_for_avg" name="Количество дней для выборки для рассчета средних значений" descr="Используется в главной форме лаборанта для расчета средних значений" dataType="Int" defaultValue="28"/>
+		<constant id="city_ext" name="Код города" descr="Используется для исходящих звонков" dataType="String" length="8" defaultValue="3452"/>
+	</constants>
+
+	<controllers>
+		<controller id="Client" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="Client"/>
+			<publicMethod id="update" modelId="Client"/>
+			<publicMethod id="delete" modelId="Client"/>
+			<publicMethod id="get_list" modelId="ClientList"/>
+			<publicMethod id="get_object" modelId="ClientDialog"/>
+			<publicMethod id="complete" modelId="Client" patternFieldId="name"/>
+			<publicMethod id="union">
+				<field id="main_client_id" dataType="Int" required="TRUE"/>
+				<field id="client_ids" dataType="String" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="set_duplicate_valid">
+				<field id="tel" dataType="String" required="TRUE"/>
+				<field id="client_ids" dataType="String" required="TRUE"/>
+			</publicMethod>			
+			<publicMethod id="get_duplicates_list">
+				<field id="from" dataType="Int"/>
+				<field id="count" dataType="Int"/>
+				<field id="ord_fields" dataType="String"/>
+				<field id="ord_directs" dataType="String"/>			
+			</publicMethod>
+			<publicMethod id="get_contact_details_list" modelId="ClientWithDetailsList">
+				<descr>Возвращает клиентов с детальной информацией</descr>
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>				
+				<field id="from" dataType="Int"/>
+				<field id="count" dataType="Int"/>
+				<field id="ord_fields" dataType="String"/>
+				<field id="ord_directs" dataType="String"/>							
+				<field id="from" dataType="Int"/>
+				<field id="count" dataType="Int"/>				
+			</publicMethod>
+			
+		</controller>		
+		<controller id="ConcreteType" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="ConcreteType"/>
+			<publicMethod id="update" modelId="ConcreteType"/>
+			<publicMethod id="delete" modelId="ConcreteType"/>
+			<publicMethod id="get_list" modelId="ConcreteType"/>			
+			<publicMethod id="get_object" modelId="ConcreteType"/>
+			<publicMethod id="complete" modelId="ConcreteType" patternFieldId="name"/>
+			<publicMethod id="get_list_for_lab" modelId="ConcreteType"/>
+		</controller>		
+		<controller id="Destination" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="Destination"/>
+			<publicMethod id="update" modelId="Destination"/>
+			<publicMethod id="delete" modelId="Destination"/>
+			<publicMethod id="get_list" modelId="DestinationList"/>
+			<publicMethod id="get_object" modelId="DestinationDialog"/>
+			<publicMethod id="complete" modelId="DestinationList" patternFieldId="name"/>
+			<publicMethod id="get_coords_on_name" modelId="Destination">
+				<field id="name" dataType="String"/>				
+			</publicMethod>
+			<publicMethod id="find_by_coords" modelId="Destination">
+				<field id="lon" dataType="Float"/>
+				<field id="lat" dataType="Float"/>
+			</publicMethod>			
+			<publicMethod id="at_dest_avg_time">
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>
+			</publicMethod>			
+			<publicMethod id="route_to_dest_avg_time">
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>
+				<field id="templ" dataType="String"/>
+			</publicMethod>			
+			
+		</controller>		
+		<controller id="Vehicle" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="Vehicle"/>
+			<publicMethod id="update" modelId="Vehicle"/>
+			<publicMethod id="delete" modelId="Vehicle"/>
+			<publicMethod id="get_list" modelId="VehicleDialog"/>
+			<publicMethod id="get_object" modelId="VehicleDialog"/>
+			<publicMethod id="complete" modelId="Vehicle" patternFieldId="plate"/>
+			<publicMethod id="complete_features" modelId="VehicleFeatureList">
+				<field id="feature" dataType="String"/>
+				<field id="ic" dataType="Int"/>
+				<field id="mid" dataType="Int"/>
+			</publicMethod>
+			<publicMethod id="complete_owners" modelId="VehicleOwnerList">
+				<field id="owner" dataType="String"/>
+			</publicMethod>			
+			<publicMethod id="complete_makes" modelId="VehicleMakeList">
+				<field id="make" dataType="String"/>
+			</publicMethod>						
+			<publicMethod id="get_gps_all">
+				<retModels>
+					<retModel id="ZoneList"/>
+					<retModel id="GPSDataAll"/>
+				</retModels>
+				<descr>Получает информацию о текущем местоположении по всем ТС.
+				Возвращает две модели: ZoneList_Model и GPSDataAll_Model</descr>
+			</publicMethod>
+			<publicMethod id="get_gps_at_work">
+				<retModels>
+					<retModel id="ZoneList"/>
+					<retModel id="GPSData"/>
+				</retModels>
+				<descr>Получает информацию о текущем местоположении по рабочим ТС.
+				Возвращает две модели: ZoneList_Model и GPSData_Model</descr>
+			</publicMethod>
+			
+			
+			<publicMethod id="get_track">
+				<field id="id" dataType="Int"/>
+				<field id="dt_from" dataType="DateTime" required="TRUE"/>
+				<field id="dt_to" dataType="DateTime" required="TRUE"/>
+				<field id="stop_dur" dataType="Time" required="TRUE"/>
+			</publicMethod>			
+		</controller>		
+		<controller id="Order" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<descr>Контроллер работы с заявками.</descr>
+			<publicMethod id="insert" modelId="Order"/>
+			<publicMethod id="update" modelId="Order"/>
+			<publicMethod id="delete" modelId="Order"/>
+			<publicMethod id="get_list" modelId="OrderList"/>
+			<publicMethod id="get_object" modelId="OrderDialog"/>
+			<publicMethod id="get_make_orders_list" modelId="OrderMakeList">
+				<descr>Получает список заявок с дополнительной информацией.</descr>
+				<field id="id" dataType="Int"/>
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>
+			</publicMethod>
+			<publicMethod id="get_temp_orders_list" retModelId="OrderTempList">
+				<descr>Получает список черновых заявок.</descr>
+			</publicMethod>
+			
+			<publicMethod id="get_avail_spots">
+				<descr>Получает список свободных временных позиций для размещения заявки с заданным количеством и скоростью разгрузки.</descr>
+				<field id="date" dataType="Date" required="TRUE">
+					<descr>Дата для которой требуется определить время.</descr>
+				</field>
+				<field id="quant" dataType="Float" required="TRUE">
+					<descr>Количество из заявки.</descr>
+				</field>
+				<field id="speed" dataType="Float" required="TRUE">
+					<descr>Скорость разгрузки из заявки.</descr>
+				</field>
+			</publicMethod>
+			<publicMethod id="set_payed">
+				<descr>Установить признак оплаты для заявки.</descr>
+				<field id="id" dataType="Int" required="TRUE">
+					<descr>Идентификатор заявки.</descr>
+				</field>
+			</publicMethod>			
+			<publicMethod id="set_temp">
+				<descr>Перенести заявку в черновики.</descr>
+				<field id="id" dataType="Int" required="TRUE">
+					<descr>Идентификатор заявки.</descr>
+				</field>
+			</publicMethod>			
+			<publicMethod id="unset_temp">
+				<descr>Перенести заявку из черновиков в основные. При переносе происходит проверка заполненности всех реквизитов заявки.</descr>
+				<field id="id" dataType="Int" required="TRUE">
+					<descr>Идентификатор заявки.</descr>
+				</field>
+			</publicMethod>			
+			<publicMethod id="get_history" retModelId="OrderHistory">
+				<descr>Получает историю заявки.</descr>
+				<field id="id" dataType="Int" required="TRUE">
+					<descr>Идентификатор заявки.</descr>
+				</field>
+			</publicMethod>						
+			<publicMethod id="get_count" modelId="OrderCountList">
+				<descr>Получает количество заявок за заданный период, сгруппированное с заданной периодичностью.</descr>
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>
+				<field id="period" dataType="Enum" enumId="periods" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="get_operator_list">
+				<retModels>
+					<retModel id="ShipmentOnLoad"/>
+					<retModel id="ShippedOrderList"/>
+					<retModel id="AssignedOrderList"/>
+				</retModels>				
+				<descr>Получает список отгрузок для отображения у оператора.Возвращает 3 модели одинаковой структуры.</descr>
+				<field id="date_time" dataType="Date" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="operator_list_move_up">
+				<descr>Сдвигает отгрузку вверх по очереди.</descr>
+				<field id="shipment_id" dataType="Int" required="TRUE"/>
+			</publicMethod>			
+			<publicMethod id="operator_list_move_down">
+				<descr>Сдвигает отгрузку вниз по очереди.</descr>
+				<field id="shipment_id" dataType="Int" required="TRUE"/>
+			</publicMethod>			
+			<publicMethod id="operator_list_set_before">
+				<descr>Устанавливает отгрузку перед определенной отгрузки в очереди.</descr>
+				<field id="shipment_id" dataType="Int" required="TRUE" descr="ID отгрузки для переноса"/>
+				<field id="after_shipment_id" dataType="Int" required="TRUE" descr="ID отгрузки, перед которой надо вставить"/>
+			</publicMethod>						
+			<publicMethod id="put_on_load" modelId="ShipmentOperator">
+				<descr>Ставит отгрузку под загрузку. Чтобы очистить место под загрузкой - отправить shipment_id=0 (null,nan)</descr>
+				<field id="shipment_id" dataType="Int" required="TRUE"/>
+			</publicMethod>			
+			<publicMethod id="set_shipped">
+				<descr>Отгружает заявку, которая находится под загрузкой.</descr>
+			</publicMethod>			
+			<publicMethod id="unset_shipped">
+				<descr>Отменяет отгрузку.</descr>
+				<field id="shipment_id" dataType="Int"/>
+			</publicMethod>						
+			
+		</controller>
+		<controller id="Offer" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="Offer"/>
+			<publicMethod id="update" modelId="Offer"/>
+			<publicMethod id="delete" modelId="Offer"/>
+			<publicMethod id="get_list" modelId="OfferList"/>
+			<publicMethod id="get_object" modelId="OfferList"/>
+		</controller>		
+		
+		<controller id="Driver" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="Driver"/>
+			<publicMethod id="update" modelId="Driver"/>
+			<publicMethod id="delete" modelId="Driver"/>
+			<publicMethod id="get_list" modelId="DriverList"/>
+			<publicMethod id="get_object" modelId="DriverList"/>			
+			<publicMethod id="complete" modelId="Driver" patternFieldId="name"/>
+		</controller>		
+		<controller id="RawMaterial" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="RawMaterial"/>
+			<publicMethod id="update" modelId="RawMaterial"/>
+			<publicMethod id="delete" modelId="RawMaterial"/>
+			<publicMethod id="get_list" modelId="RawMaterial"/>
+			<publicMethod id="get_object" modelId="RawMaterial"/>
+			<publicMethod id="complete" modelId="RawMaterial" patternFieldId="name"/>
+			<publicMethod id="get_list_for_concrete" modelId="RawMaterial"/>
+			<publicMethod id="supplier_orders_list">
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>
+				<field id="templ" dataType="String"/>			
+			</publicMethod>
+			<publicMethod id="update_procurement">
+				<field id="docs" dataType="Text"/>
+			</publicMethod>
+			<publicMethod id="oper_week_report"/>
+			<publicMethod id="total_report">
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>							
+			</publicMethod>
+			<publicMethod id="total_details_report">
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>							
+			</publicMethod>			
+			<publicMethod id="set_min_quant">
+				<field id="week_day" dataType="DateTime"/>
+				<field id="material_id" dataType="Int"/>
+				<field id="quant" dataType="Float" precision="3" length="19"/>
+			</publicMethod>
+			<publicMethod id="correct_consumption">
+				<field id="date" dataType="Date"/>
+				<field id="material_id" dataType="Int"/>
+				<field id="quant" unsigned="FALSE" dataType="Float" precision="3" length="19"/>
+			</publicMethod>
+			<publicMethod id="correct_obnul">
+				<field id="date" dataType="Date"/>
+				<field id="material_id" dataType="Int"/>
+				<field id="quant" unsigned="FALSE" dataType="Float" precision="3" length="19"/>
+			</publicMethod>			
+			<publicMethod id="correct_list">
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>							
+			</publicMethod>						
+			<publicMethod id="total_list">
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>							
+			</publicMethod>									
+			<publicMethod id="mat_totals">
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>							
+			</publicMethod>												
+		</controller>
+		<controller id="RawMaterialConsRateDate" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="RawMaterialConsRateDate"/>
+			<publicMethod id="update" modelId="RawMaterialConsRateDate"/>
+			<publicMethod id="delete" modelId="RawMaterialConsRateDate"/>
+			<publicMethod id="get_list" modelId="RawMaterialConsRateDateList"/>
+			<publicMethod id="get_object" modelId="RawMaterialConsRateDateList"/>
+			<publicMethod id="recalc_consumption">
+				<field id="period_id" dataType="Int" required="TRUE"/>
+			</publicMethod>											
+		</controller>			
+		<controller id="RawMaterialProcurRate" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="RawMaterialProcurRate"/>
+			<publicMethod id="update" modelId="RawMaterialProcurRate"/>
+			<publicMethod id="delete" modelId="RawMaterialProcurRate"/>
+			<publicMethod id="get_list" modelId="RawMaterialProcurRateList"/>
+			<publicMethod id="get_object" modelId="RawMaterialProcurRateList"/>
+		</controller>					
+		<controller id="RAMaterialConsumption" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="get_dates_list">
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>			
+			</publicMethod>		
+			<publicMethod id="get_docs_list">
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>			
+			</publicMethod>					
+		</controller>					
+		<controller id="RawMaterialConsRate" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="RawMaterialConsRate"/>
+			<publicMethod id="update" modelId="RawMaterialConsRate"/>
+			<publicMethod id="delete" modelId="RawMaterialConsRate"/>
+			<publicMethod id="get_list" modelId="RawMaterialConsRate"/>
+			<publicMethod id="get_object" modelId="RawMaterialConsRate"/>
+			<publicMethod id="raw_material_cons_report">
+				<field id="cond_fields" dataType="String"/>
+				<field id="cond_vals" dataType="String"/>
+				<field id="cond_sgns" dataType="String"/>
+				<field id="cond_ic" dataType="String"/>
+				<field id="grp_fields" dataType="String"/>
+				<field id="agg_fields" dataType="String"/>
+			</publicMethod>
+		</controller>			
+		
+		<controller id="VehicleSchedule" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="VehicleSchedule"/>
+			<publicMethod id="update" modelId="VehicleSchedule"/>
+			<publicMethod id="delete" modelId="VehicleSchedule"/>
+			<publicMethod id="get_list" modelId="VehicleScheduleList"/>
+			<publicMethod id="complete" modelId="VehicleScheduleComplete" patternFieldId="vehicle_schedule_descr"/>			
+			<publicMethod id="get_current_veh_list" retModelId="CurrentVehList">
+				<field id="cond_fields" dataType="String"/>
+				<field id="cond_vals" dataType="String"/>
+				<field id="cond_sgns" dataType="String"/>
+				<field id="cond_ic" dataType="String"/>
+			</publicMethod>
+			<publicMethod id="get_object" modelId="VehicleScheduleList"/>
+			<publicMethod id="set_free">
+				<field id="id" dataType="Int"/>
+			</publicMethod>
+			<publicMethod id="set_out">
+				<field id="id" dataType="Int"/>
+				<field id="comment_text" dataType="Text"/>			
+			</publicMethod>
+			<publicMethod id="gen_schedule">
+				<field id="date_from" dataType="Date"/>
+				<field id="date_to" dataType="Date"/>
+				<field id="vehicle_id" dataType="Int"/>
+				<field id="day1" dataType="Int"/>
+				<field id="day2" dataType="Int"/>
+				<field id="day3" dataType="Int"/>
+				<field id="day4" dataType="Int"/>
+				<field id="day5" dataType="Int"/>
+				<field id="day6" dataType="Int"/>
+				<field id="day7" dataType="Int"/>
+			</publicMethod>
+			<publicMethod id="get_vehicle_efficiency">
+				<field id="cond_fields" dataType="String"/>
+				<field id="cond_vals" dataType="String"/>
+				<field id="cond_sgns" dataType="String"/>
+				<field id="cond_ic" dataType="String"/>
+			</publicMethod>			
+			<publicMethod id="get_schedule_report">
+				<field id="cond_fields" dataType="String"/>
+				<field id="cond_vals" dataType="String"/>
+				<field id="cond_sgns" dataType="String"/>
+				<field id="cond_ic" dataType="String"/>
+			</publicMethod>						
+			<publicMethod id="get_schedule_report_all">
+				<field id="cond_fields" dataType="String"/>
+				<field id="cond_vals" dataType="String"/>
+				<field id="cond_sgns" dataType="String"/>
+				<field id="cond_ic" dataType="String"/>
+			</publicMethod>									
+			<publicMethod id="get_runs_inf">
+				<field id="cond_fields" dataType="String"/>
+				<field id="cond_vals" dataType="String"/>
+				<field id="cond_sgns" dataType="String"/>
+				<field id="cond_ic" dataType="String"/>
+			</publicMethod>	
+		</controller>			
+		<controller id="Shipment" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="Shipment"/>
+			<publicMethod id="update" modelId="Shipment"/>
+			<publicMethod id="delete" modelId="Shipment"/>
+			<publicMethod id="get_list" modelId="ShipmentList"/>
+			<publicMethod id="get_list_for_order" modelId="ShipmentForOrderList">
+				<field id="cond_fields" dataType="String"/>
+				<field id="cond_vals" dataType="String"/>
+				<field id="cond_sgns" dataType="String"/>
+				<field id="cond_ic" dataType="String"/>
+			</publicMethod>
+			<publicMethod id="get_pump_list" modelId="ShipmentPumpList">
+				<field id="cond_fields" dataType="String"/>
+				<field id="cond_vals" dataType="String"/>
+				<field id="cond_sgns" dataType="String"/>
+				<field id="cond_ic" dataType="String"/>
+				<field id="from" dataType="Int"/>
+				<field id="count" dataType="Int"/>
+				<field id="ord_fields" dataType="String"/>
+				<field id="ord_directs" dataType="String"/>
+			</publicMethod>
+			<publicMethod id="get_shipment_date_list" modelId="ShipmentPumpList">
+				<field id="cond_fields" dataType="String"/>
+				<field id="cond_vals" dataType="String"/>
+				<field id="cond_sgns" dataType="String"/>
+				<field id="cond_ic" dataType="String"/>
+				<field id="from" dataType="Int"/>
+				<field id="count" dataType="Int"/>
+				<field id="ord_fields" dataType="String"/>
+				<field id="ord_directs" dataType="String"/>
+			</publicMethod>			
+			
+			<publicMethod id="get_object" modelId="ShipmentDialog"/>
+			
+			<publicMethod id="shipment_report" modelId="ShipmentRep">
+				<field id="ship_date_time"/>
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>
+				<field id="grp_fields" dataType="String"/>
+				<field id="agg_fields" dataType="String"/>				
+			</publicMethod>
+			<publicMethod id="shipment_invoice" modelId="ModelSQL">
+				<field id="id" dataType="Int"/>
+				<field id="templ" dataType="String"/>
+			</publicMethod>
+			<publicMethod id="get_time_list" modelId="ShipmentTimeList">
+				<field id="cond_fields" dataType="String"/>
+				<field id="cond_vals" dataType="String"/>
+				<field id="cond_sgns" dataType="String"/>
+				<field id="cond_ic" dataType="String"/>
+				<field id="from" dataType="Int"/>
+				<field id="count" dataType="Int"/>
+				<field id="ord_fields" dataType="String"/>
+				<field id="ord_directs" dataType="String"/>
+			</publicMethod>
+			
+		</controller>					
+		<controller id="User" parentId="ControllerSQL" state="TRUE" noState="TRUE">
+			<publicMethod id="insert" modelId="User"/>
+			<publicMethod id="update" modelId="User"/>
+			<publicMethod id="delete" modelId="User"/>
+			<publicMethod id="get_list" modelId="UserList"/>
+			<publicMethod id="get_object" modelId="UserDialog"/>
+			<publicMethod id="set_new_pwd">
+				<field id="pwd" dataType="Password"/>
+			</publicMethod>
+			<publicMethod id="reset_pwd">
+				<field id="user_id" dataType="Int" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="login">
+				<field id="name" dataType="String" alias="Имя пользователя" length="50"/>
+				<field id="pwd" dataType="Password" alias="Пароль" length="20"/>
+			</publicMethod>
+			<publicMethod id="login_ext">
+				<field id="name" dataType="String" alias="Имя пользователя" length="50"/>
+				<field id="pwd" dataType="Password" alias="Пароль" length="20"/>
+			</publicMethod>			
+			<publicMethod id="login_refresh">
+				<field id="refresh_token" dataType="String" required="true" length="50"/>
+			</publicMethod>			
+			<publicMethod id="logout"/>
+			<publicMethod id="get_time"/>
+		</controller>
+		<controller id="Constant" parentId="ControllerSQL" state="TRUE" noState="TRUE">
+			<publicMethod id="update" modelId="ConstantList"/>
+			<publicMethod id="get_list" modelId="ConstantList"/>
+			<publicMethod id="get_object" modelId="ConstantList"/>
+			<publicMethod id="get_values">
+				<field id="id_list" dataType="String"/>
+			</publicMethod>
+		</controller>
+		<controller id="Enum" parentId="ControllerSQL" state="TRUE" noState="TRUE">
+			<publicMethod id="get_enum_list">
+				<field id="id" dataType="String"/>
+			</publicMethod>
+		</controller>						
+		<controller id="Supplier" parentId="ControllerSQL">
+			<publicMethod id="insert" modelId="Supplier"/>
+			<publicMethod id="update" modelId="Supplier"/>
+			<publicMethod id="delete" modelId="SupplierList"/>
+			<publicMethod id="get_list" modelId="SupplierList"/>
+			<publicMethod id="get_object" modelId="Supplier"/>
+			<publicMethod id="complete" modelId="Supplier" patternFieldId="name"/>
+		</controller>		
+		<controller id="RawMaterialProcurUpload" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="get_list" modelId="RawMaterialProcurUploadView"/>
+		</controller>
+		<controller id="DOCMaterialProcurement" parentId="ControllerSQLDOC" state="TRUE">
+			<publicMethod id="insert" modelId="DOCMaterialProcurement"/>
+			<publicMethod id="update" modelId="DOCMaterialProcurement"/>
+			<publicMethod id="delete" modelId="DOCMaterialProcurement"/>
+			<publicMethod id="get_list" modelId="DOCMaterialProcurementList"/>
+			<publicMethod id="get_object" modelId="DOCMaterialProcurementList"/>
+			<publicMethod id="before_open">
+				<field id="doc_id" dataType="Int"/>
+			</publicMethod>
+			<publicMethod id="get_actions">
+				<field id="doc_id" dataType="Int"/>
+			</publicMethod>			
+			<publicMethod id="get_print">
+				<field id="doc_id" dataType="Int"/>
+			</publicMethod>				
+			<publicMethod id="get_material_list">
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>			
+			</publicMethod>
+		</controller>		
+		<controller id="Lang" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="Lang"/>
+			<publicMethod id="update" modelId="Lang"/>
+			<publicMethod id="delete" modelId="Lang"/>
+			<publicMethod id="get_list" modelId="Lang"/>
+			<publicMethod id="get_object" modelId="Lang"/>
+			<publicMethod id="complete" modelId="Lang" patternFieldId="name"/>
+			<publicMethod id="get_locale">
+				<field id="name" dataType="String" required="TRUE"/>
+			</publicMethod>			
+		</controller>		
+		
+		<controller id="SMSPattern" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="SMSPattern"/>
+			<publicMethod id="update" modelId="SMSPattern"/>
+			<publicMethod id="delete" modelId="SMSPattern"/>
+			<publicMethod id="get_list" modelId="SMSPatternList"/>
+			<publicMethod id="get_object" modelId="SMSPatternList"/>
+		</controller>				
+		<controller id="ClientType" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="ClientType"/>
+			<publicMethod id="update" modelId="ClientType"/>
+			<publicMethod id="delete" modelId="ClientType"/>		
+			<publicMethod id="get_list" modelId="ClientType"/>
+			<publicMethod id="get_object" modelId="ClientType"/>
+		</controller>				
+		<controller id="ClientComeFrom" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="ClientComeFrom"/>
+			<publicMethod id="update" modelId="ClientComeFrom"/>
+			<publicMethod id="delete" modelId="ClientComeFrom"/>		
+			<publicMethod id="get_list" modelId="ClientComeFrom"/>
+			<publicMethod id="get_object" modelId="ClientComeFrom"/>
+		</controller>				
+		<controller id="PumpVehicle" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="PumpVehicle"/>
+			<publicMethod id="update" modelId="PumpVehicle"/>
+			<publicMethod id="delete" modelId="PumpVehicle"/>		
+			<publicMethod id="get_list" modelId="PumpVehicleList"/>
+			<publicMethod id="get_object" modelId="PumpVehicleList"/>
+			<publicMethod id="get_price">
+				<field id="pump_id" dataType="Int" required="TRUE"/>
+				<field id="quant" dataType="Float" length="19" precision="3" required="TRUE"/>
+			</publicMethod>
+		</controller>				
+		<controller id="PumpPrice" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="PumpPrice"/>
+			<publicMethod id="update" modelId="PumpPrice"/>
+			<publicMethod id="delete" modelId="PumpPrice"/>		
+			<publicMethod id="get_list" modelId="PumpPrice"/>
+			<publicMethod id="get_object" modelId="PumpPrice"/>
+		</controller>				
+		<controller id="PumpPriceValue" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="PumpPriceValue"/>
+			<publicMethod id="update" modelId="PumpPriceValue"/>
+			<publicMethod id="delete" modelId="PumpPriceValue"/>		
+			<publicMethod id="get_list" modelId="PumpPriceValue"/>
+			<publicMethod id="get_object" modelId="PumpPriceValue"/>
+		</controller>				
+
+		<controller id="OrderPump" parentId="ControllerSQL">
+			<publicMethod id="insert" modelId="OrderPump"/>
+			<publicMethod id="update" modelId="OrderPump"/>
+			<publicMethod id="delete" modelId="OrderPump"/>
+			<publicMethod id="get_list" modelId="OrderPumpList"/>
+			<publicMethod id="get_object" modelId="OrderPumpList"/>
+		</controller>		
+		<controller id="MainMenu" parentId="Controller">
+			<publicMethod id="get_list"/>
+		</controller>		
+		<controller id="Widget" parentId="ControllerSQL">
+			<publicMethod id="get_plant_load" modelId="PlatLoadChart">
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>
+			</publicMethod>
+		</controller>		
+		<controller id="Contact" parentId="ControllerSQL">
+			<descr>Описывает контакт (ФИО,должность,комментарий)</descr>
+			<publicMethod id="insert" modelId="Contact"/>
+			<publicMethod id="update" modelId="Contact"/>
+			<publicMethod id="delete" modelId="Contact"/>
+			<publicMethod id="complete" modelId="ContactComplete" patternFieldId="name"/>
+			<publicMethod id="get_list" modelId="ContactList"/>
+			<publicMethod id="get_object" modelId="ContactList"/>
+			<publicMethod id="get_contact_details_list" modelId="ContactWithDetailsList">
+				<descr>Возвращает контакты с детальной информацией</descr>
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>				
+				<field id="from" dataType="Int"/>
+				<field id="count" dataType="Int"/>
+				<field id="ord_fields" dataType="String"/>
+				<field id="ord_directs" dataType="String"/>				
+			</publicMethod>
+		</controller>		
+		<controller id="ContactDetail" parentId="ControllerSQL">
+			<descr>Описывает данные контакта (телефоны,эл.почта, т.д)</descr>
+			<publicMethod id="insert" modelId="ContactDetail"/>
+			<publicMethod id="update" modelId="ContactDetail"/>
+			<publicMethod id="delete" modelId="ContactDetail"/>
+			<publicMethod id="get_list" modelId="ContactDetail"/>
+			<publicMethod id="get_object" modelId="ContactDetail"/>
+			<publicMethod id="get_full_list" modelId="ContactDetailFullList">
+				<descr>Возвращает список всей контактной информации с шапками (контакты или контрагенты).</descr>
+				<field id="cond_fields" dataType="String" required="TRUE"/>
+				<field id="cond_vals" dataType="String" required="TRUE"/>
+				<field id="cond_sgns" dataType="String" required="TRUE"/>
+				<field id="cond_ic" dataType="String"/>
+			</publicMethod>
+			
+		</controller>		
+		
+		<controller id="ClientContact" parentId="ControllerSQL">
+			<descr>Соединяет контакты с клиентами</descr>
+			<publicMethod id="insert_contact">
+				<descr>Добавляет новый контакт заданному клиенту</descr>
+				<field id="client_id" dataType="Int" required="TRUE"/>
+				<field id="first_name" dataType="String" length="50"/>
+				<field id="middle_name" dataType="String" length="50"/>
+				<field id="last_name" dataType="String" length="50" required="TRUE"/>
+				<field id="post" dataType="String" length="100"/>
+				<field id="description" dataType="Text"/>
+				<field id="main" dataType="Bool" defaultValue="FALSE"/>
+				<field id="ret_id" dataType="Bool" defaultValue="FALSE"/>
+			</publicMethod>						
+			<publicMethod id="set_main" modelId="ClientContact">
+				<descr>Устанавливает признак основного у контакта</descr>
+				<field id="client_id" dataType="Int" required="TRUE"/>			
+				<field id="contact_id" dataType="Int" required="TRUE"/>			
+			</publicMethod>
+			<publicMethod id="insert" modelId="ClientContact"/>
+			<publicMethod id="update" modelId="ClientContact"/>
+			<publicMethod id="delete" modelId="ClientContact"/>
+			<publicMethod id="get_list" modelId="ClientContactList"/>
+			<publicMethod id="get_object" modelId="ClientContactList"/>
+		</controller>		
+		<controller id="ClientContactDetail" parentId="ControllerSQL">
+			<descr>Соединяет контактную информацию с клиентами</descr>
+			<publicMethod id="insert_contact_detail">
+				<descr>Добавляет новую контактную информацтю заданному клиенту</descr>
+				<field id="client_id" dataType="Int" required="TRUE"/>
+				<field id="name" dataType="String"/>
+				<field id="value" dataType="String"/>
+				<field id="main" dataType="Bool"/>
+				<field id="contact_type" dataType="Enum" enumId="contact_types"/>
+				<field id="ret_id" dataType="Bool" defaultValue="FALSE"/>
+			</publicMethod>
+			<publicMethod id="set_main" modelId="ClientContact">
+				<descr>Устанавливает признак основного у контактной информации</descr>
+				<field id="client_id" dataType="Int" required="TRUE"/>			
+				<field id="contact_detail_id" dataType="Int" required="TRUE"/>			
+			</publicMethod>			
+			<publicMethod id="insert" modelId="ClientContactDetail"/>
+			<publicMethod id="update" modelId="ClientContactDetail"/>
+			<publicMethod id="delete" modelId="ClientContactDetail"/>
+			<publicMethod id="get_list" modelId="ClientContactDetailList"/>
+			<publicMethod id="get_object" modelId="ClientContactDetailList"/>
+			<publicMethod id="insert_client_with_contact_detail">
+				<descr>Добавляет клиента и контактную информацию</descr>
+				<field id="name" dataType="String" length="50" required="TRUE"/>
+				<field id="detail_contact_type" dataType="String" length="50"/>
+				<field id="detail_name" dataType="String" length="100"/>
+				<field id="detail_value" dataType="String" length="100"/>
+				<field id="main" dataType="Bool"/>
+				<field id="ret_id" dataType="Bool"/>
+			</publicMethod>			
+		</controller>
+		<controller id="DriverContactDetail" parentId="ControllerSQL">
+			<descr>Соединяет контактную информацию с водителем</descr>
+			<publicMethod id="insert_contact_detail">
+				<descr>Добавляет новую контактную информацтю заданному водителю</descr>
+				<field id="driver_id" dataType="Int" required="TRUE"/>
+				<field id="name" dataType="String"/>
+				<field id="value" dataType="String"/>
+				<field id="main" dataType="Bool"/>
+				<field id="contact_type" dataType="Enum" enumId="contact_types"/>
+				<field id="ret_id" dataType="Bool" defaultValue="FALSE"/>
+			</publicMethod>
+			<publicMethod id="set_main" modelId="DriverContact">
+				<descr>Устанавливает признак основного у контактной информации</descr>
+				<field id="driver_id" dataType="Int" required="TRUE"/>			
+				<field id="contact_detail_id" dataType="Int" required="TRUE"/>			
+			</publicMethod>			
+			<publicMethod id="insert" modelId="DriverContactDetail"/>
+			<publicMethod id="update" modelId="DriverContactDetail"/>
+			<publicMethod id="delete" modelId="DriverContactDetail"/>
+			<publicMethod id="get_list" modelId="DriverContactDetailList"/>
+			<publicMethod id="get_object" modelId="DriverContactDetailList"/>
+			<publicMethod id="insert_driver_with_contact_detail">
+				<descr>Добавляет водителя и контактную информацию</descr>
+				<field id="name" dataType="String" length="50" required="TRUE"/>
+				<field id="detail_contact_type" dataType="String" length="50"/>
+				<field id="detail_name" dataType="String" length="100"/>
+				<field id="detail_value" dataType="String" length="100"/>
+				<field id="main" dataType="Bool"/>
+				<field id="ret_id" dataType="Bool"/>
+			</publicMethod>			
+		</controller>		
+				
+		<controller id="ContactContactDetail" parentId="ControllerSQL">
+			<descr>Соединяет контакты с контактной информацией</descr>
+			<publicMethod id="insert_contact_detail">
+				<descr>Добавляет новую контактную информацтю заданному контакту</descr>
+				<field id="contact_id" dataType="Int" required="TRUE"/>
+				<!--<field id="contact_detail_id" dataType="Int"/>-->
+				<field id="name" dataType="String" required="TRUE"/>
+				<field id="value" dataType="String" required="TRUE"/>
+				<field id="main" dataType="Bool" defaultValue="FALSE"/>
+				<field id="contact_type" dataType="Enum" enumId="contact_types" required="TRUE"/>
+				<field id="ret_id" dataType="Bool" defaultValue="FALSE"/>
+			</publicMethod>									
+			<publicMethod id="insert_contact_with_contact_detail">
+				<descr>Добавляет контакт и контактную информацию</descr>
+				<field id="first_name" dataType="String" length="50" required="TRUE"/>
+				<field id="middle_name" dataType="String" length="50"/>
+				<field id="last_name" dataType="String" length="50"/>
+				<field id="post" dataType="String" length="100"/>
+				<field id="description" dataType="Text"/>				
+				<field id="detail_contact_type" dataType="String" length="50"/>
+				<field id="detail_name" dataType="String" length="100"/>
+				<field id="detail_value" dataType="String" length="100"/>
+				<field id="main" dataType="Bool"/>
+				<field id="ret_id" dataType="Bool"/>
+			</publicMethod>
+			<publicMethod id="set_main" modelId="ContactContactDetail">
+				<descr>Устанавливает признак основного у контактной информации</descr>
+				<field id="contact_id" dataType="Int" required="TRUE"/>			
+				<field id="contact_detail_id" dataType="Int" required="TRUE"/>			
+			</publicMethod>			
+			
+			<publicMethod id="insert" modelId="ContactContactDetail"/>
+			<publicMethod id="update" modelId="ContactContactDetail"/>
+			<publicMethod id="delete" modelId="ContactContactDetail"/>
+			<publicMethod id="get_list" modelId="ContactContactDetailList"/>
+			<publicMethod id="get_object" modelId="ContactContactDetailList"/>
+		</controller>		
+		
+		<controller id="UIStorage" parentId="ControllerSQL">
+			<descr>Хранилище с пользовательскими настройками</descr>
+			<publicMethod id="set">
+				<descr>Записывает данные в хранилище по идентификатору</descr>
+				<field id="ui_id" dataType="String" length="50" required="TRUE"/>
+				<field id="data" dataType="Text" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="get" resModelId="UIStorageList">
+				<descr>Получает данные из хранилища по списку идентификаторов</descr>
+				<field id="ui_id_list" dataType="String">
+					<descr>Список идентификаторов. Разделитель - запятая</descr>
+				</field>
+			</publicMethod>			
+			<publicMethod id="delete" modelId="UIStorage"/>
+		</controller>		
+
+		<controller id="SpecialistRequest" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<descr>Управление вызовами специалиста. При добавлении происходит поиск контрагента по базе контактов. Если есть такой контакт, то происходит привязка вызова к контрагенту. Актуально при добавлении вызова с сайта, когда пользователь вносит только телефон.</descr>
+			<publicMethod id="insert" modelId="SpecialistRequest"/>
+			<publicMethod id="update" modelId="SpecialistRequest"/>
+			<publicMethod id="delete" modelId="SpecialistRequest"/>				
+			<publicMethod id="get_list" modelId="SpecialistRequestList"/>
+			<publicMethod id="get_object" modelId="SpecialistRequestList"/>
+			<publicMethod id="set_viewed">
+				<descr>Пометить вызов как просмотренный</descr>
+				<field id="doc_id" dataType="Int" required="TRUE"/>
+			</publicMethod>			
+		</controller>				
+		<controller id="SMSForSending" parentId="ControllerSQL">
+			<descr>Управление очередью СМС сообщений.</descr>
+			<publicMethod id="insert" modelId="SMSForSending"/>
+			<publicMethod id="update" modelId="SMSForSending"/>
+			<publicMethod id="delete" modelId="SMSForSending"/>
+			<publicMethod id="get_list" modelId="SMSForSending"/>
+		</controller>		
+		<controller id="Call" parentId="ControllerSQL">
+			<descr>Управление звонками.</descr>
+			<publicMethod id="get_list" modelId="CallList"/>
+			<publicMethod id="get_active_call" retModelId="CallActive"/>
+			<publicMethod id="set_comment">
+				<descr>Устанавливает комментарий к звонку.</descr>
+				<field id="id" dataType="Int" required="TRUE">
+					<descr>ID звонка</descr>
+				</field>
+				<field id="value" dataType="Text" required="TRUE">
+					<descr>Значение комментария</descr>
+				</field>
+			</publicMethod>
+			<publicMethod id="dial">
+				<descr>Набирает номер.</descr>
+				<field id="from" dataType="String" required="TRUE">
+					<descr>Внутренний номер сотрудника</descr>
+				</field>
+				<field id="to" dataType="String" required="TRUE">
+					<descr>Номер для набора.Номер может быть в любом формате,беруться только цифры.Должно быть 10 цифр или 11 в случае если добавлен префикс (8 или 7) Если нет - ошибка.Например следующие номера корректы: 79222695251,89222695251,9222695251,+7(922)-269-5251</descr>
+				</field>
+			</publicMethod>			
+		</controller>		
+		<controller id="DefCallReply" parentId="ControllerSQL">
+			<descr>Управление предопределенными ответами на звонки.</descr>
+			<publicMethod id="insert" modelId="DefCallReply"/>
+			<publicMethod id="update" modelId="DefCallReply"/>
+			<publicMethod id="delete" modelId="DefCallReply"/>			
+			<publicMethod id="get_list" modelId="DefCallReply"/>
+		</controller>		
+		<controller id="VehicleMake" parentId="ControllerSQL">
+			<descr>Справочник марок автомобилей.</descr>
+			<publicMethod id="insert" modelId="VehicleMake"/>
+			<publicMethod id="update" modelId="VehicleMake"/>
+			<publicMethod id="delete" modelId="VehicleMake"/>
+			<publicMethod id="get_list" modelId="VehicleMake"/>
+			<publicMethod id="get_object" modelId="VehicleMake"/>
+		</controller>
+		<controller id="VehicleFeature" parentId="ControllerSQL">
+			<descr>Справочник свойств автомобилей.</descr>
+			<publicMethod id="insert" modelId="VehicleFeature"/>
+			<publicMethod id="update" modelId="VehicleFeature"/>
+			<publicMethod id="delete" modelId="VehicleFeature"/>
+			<publicMethod id="get_list" modelId="VehicleFeature"/>
+			<publicMethod id="get_object" modelId="VehicleFeature"/>
+		</controller>
+		<controller id="OrderTempComment" parentId="ControllerSQL">
+			<descr>Справочник предопределенных причин помещения заявок в черновики</descr>
+			<publicMethod id="insert" modelId="OrderTempComment"/>
+			<publicMethod id="update" modelId="OrderTempComment"/>
+			<publicMethod id="delete" modelId="OrderTempComment"/>
+			<publicMethod id="get_list" modelId="OrderTempComment"/>
+			<publicMethod id="get_object" modelId="OrderTempComment"/>
+		</controller>
+		<controller id="Bank" parentId="ControllerSQL">
+			<descr>Справочник банков</descr>
+			<publicMethod id="insert" modelId="Bank"/>
+			<publicMethod id="update" modelId="Bank"/>
+			<publicMethod id="delete" modelId="Bank"/>
+			<publicMethod id="get_list" modelId="Bank"/>
+			<publicMethod id="get_object" modelId="Bank"/>
+		</controller>
+		<controller id="ClientBank" parentId="ControllerSQL">
+			<descr>Справочник банковских счетов клиента</descr>
+			<publicMethod id="insert" modelId="ClientBank"/>
+			<publicMethod id="update" modelId="ClientBank"/>
+			<publicMethod id="delete" modelId="ClientBank"/>
+			<publicMethod id="get_list" modelId="ClientBankList"/>
+			<publicMethod id="get_object" modelId="ClientBankList"/>
+		</controller>
+		
+	</controllers>
+	<permissions>
+		<allow controllerId="all" methodId="all" roleId="boss"/>
+		<allow controllerId="all" methodId="all" roleId="operator"/>
+		<allow controllerId="all" methodId="all" roleId="owner"/>
+		<allow controllerId="all" methodId="all" roleId="manager"/>
+		<allow controllerId="all" methodId="all" roleId="dispatcher"/>
+		<allow controllerId="all" methodId="all" roleId="accountant"/>
+		<allow controllerId="all" methodId="all" roleId="lab_worker"/>
+		<allow controllerId="all" methodId="all" roleId="sales"/>
+		<allow controllerId="all" methodId="all" roleId="supplies"/>
+		<allow controllerId="all" methodId="all" roleId="plant_director"/>
+		<allow controllerId="all" methodId="all" roleId="supervisor"/>
+		<allow controllerId="User" methodId="login" roleId="guest"/>
+		<allow controllerId="User" methodId="login_html" roleId="guest"/>
+		<allow controllerId="User" methodId="login_k" roleId="guest"/>
+		<allow controllerId="User" methodId="login_ext" roleId="guest"/>
+		<allow controllerId="User" methodId="logged" roleId="guest"/>
+		<allow controllerId="User" methodId="logout" roleId="guest"/>
+	</permissions>
+
+	<mainMenu roleId="owner">	
+		<menuItem viewId="dashboard" descr="Рабочий стол"/>
+		<menuItem descr="Управление клиентами">
+			<menuItem viewId="client/calls" descr="Звонки"/>
+			<menuItem viewId="client/mail" descr="Почта"/>
+			<menuItem viewId="client/contacts" descr="Контакты"/>
+			<menuItem viewId="client/contractor" descr="Контрагенты"/>
+			<menuItem viewId="client/distribution" descr="Рассылки"/>
+		</menuItem>
+		<menuItem descr="Управление отгрузками">
+			<menuItem viewId="bids/active" descr="Заявки">
+				<menuItem viewId="bids/active" descr="Текущие заявки"/>
+				<menuItem viewId="bids/journal" descr="Журнал заявок"/>
+			</menuItem>
+			<menuItem viewId="shipments" descr="Отгрузки"/>
+			<menuItem viewId="shipments/trips" descr="Рейсы"/>
+			<menuItem viewId="shipments/reports" descr="Отчеты"/>
+		</menuItem>
+		<menuItem descr="Транспорт">
+			<menuItem viewId="vehicles" descr="Транспортные средства">
+				<menuItem viewId="vehicles/mixers" descr="Автобетоносмесители"/>
+				<menuItem viewId="vehicles/belts" descr="Транспортерные ленты"/>
+				<menuItem viewId="vehicles/pumps" descr="Автобетононасосы"/>
+			</menuItem>
+			<menuItem viewId="vehicles/drivers" descr="Водители"/>
+			<menuItem viewId="vehicles/schedule" descr="График работы"/>
+			<menuItem viewId="vehicles/timesheet" descr="Табель рабочего времени"/>
+			<menuItem viewId="vehicles/reports" descr="Отчеты"/>
+		</menuItem>
+		<menuItem descr="Сотрудники">
+			<menuItem viewId="employees" descr="Список сотрудников"/>
+			<menuItem viewId="employees/schedule" descr="График работы"/>
+			<menuItem viewId="employees/absences" descr="График отсутствий"/>
+			<menuItem viewId="employees/reports" descr="Отчеты"/>
+		</menuItem>
+		<menuItem descr="Лаборатория">
+			<menuItem viewId="lab/input-control" descr="Входной контроль качества"/>
+			<menuItem viewId="lab/samples-test" descr="Испытание образцов"/>
+		</menuItem>
+		<menuItem descr="Склад">
+			<menuItem viewId="storage" descr="Общая таблица"/>
+			<menuItem viewId="storage/income" descr="Поступления"/>
+			<menuItem viewId="storage/expenses" descr="Расход"/>
+			<menuItem viewId="storage/raw" descr="Сырье"/>
+			<menuItem viewId="storage/supply-requests" descr="Заявки на поставку"/>
+			<menuItem viewId="storage/expenses-adjustment" descr="Корректировка расхода"/>
+		</menuItem>
+		<menuItem descr="Настройки">
+			<menuItem viewId="settings/objects" descr="Объекты"/>
+			<menuItem viewId="settings/pricing-schemes" descr="Схемы ценообразования">
+				<menuItem viewId="settings/pricing-schemes/belts" descr="Транспортные ленты"/>
+				<menuItem viewId="settings/pricing-schemes/pumps" descr="Автобетононасосы"/>
+				<menuItem viewId="settings/pricing-schemes/mixers" descr="Автобетоносмесители"/>
+			</menuItem>
+			<menuItem viewId="settings/concrete-marks" descr="Марки бетона"/>
+			<menuItem viewId="settings/clients-management" descr="Управление клиентами">
+				<menuItem viewId="settings/contractor-types" descr="Виды контрагентов"/>
+				<menuItem viewId="settings/request-sources" descr="Источники обращений"/>
+			</menuItem>
+			<menuItem viewId="settings/suppliers" descr="Поставщики"/>
+			<menuItem viewId="settings/telephony" descr="Телефония"/>
+			<menuItem viewId="settings/sms-templates" descr="Шаблоны SMS сообщений"/>
+			<menuItem viewId="settings/constants" descr="Константы"/>
+			<menuItem viewId="settings/expenses-norms" descr="Нормы расходов"/>
+		</menuItem>
+	</mainMenu>	
+	
+	<mainMenu roleId="boss">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="ShipmentOperator_View" descr="Отгрузки (оператор)"/>
+			<menuItem viewId="OrderList_View" descr="Журнал заявок"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="ShipmentTimeList_View" descr="Опоздания назначений и отгрузок"/>
+			<menuItem viewId="OrderFromClientList_View" descr="Заявки от клиентов"/>
+			<menuItem viewId="SpecialistRequestList_View" descr="Вызовы специалиста"/>
+			<menuItem viewId="SiteFeedBackList_View" descr="Обратная связь с сайта"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+			<menuItem viewId="ShipmentPumpList_View" descr="Журнал насосы"/>			
+			<menuItem viewId="AstCall_View" descr="Звонки"/>			
+		</menuItem>	
+		<menuItem descr="Доставка и прокачка">		
+			<menuItem viewId="Map_View" descr="ТС на карте"/>
+			<menuItem viewId="VehicleStopsReport_View" descr="Стоянки на объекте"/>
+			<menuItem viewId="VehicleScheduleList_View" descr="Графики работы"/>
+			<menuItem viewId="ScheduleGen_View" descr="Формирование графиков"/>
+			<menuItem viewId="VehicleScheduleReportAll_View" descr="Печать графика"/>
+			<menuItem viewId="DriverCheatReport_View" descr="Повторные поездки по самовывозу"/>
+			<menuItem viewId="RouteToDestAvgTimeRep_View" descr="Среднее время до объктов"/>
+			<menuItem viewId="VehicleEfficiency_View" descr="Отчет работы миксеров (эффективность)"/>
+		</menuItem>
+		<menuItem descr="Лаборатория">
+			<menuItem viewId="SandQuarryVal_View" descr="Журнал песок"/>
+			<menuItem viewId="StoneQuarryVal_View" descr="Журнал щебень"/>		
+			<menuItem viewId="LabEntryList_View" descr="Журнал испытания образцов"/>
+			<menuItem viewId="LabEntryRep_View" descr="Отчет лаборанта"/>
+			<menuItem viewId="LabItemRep_View" descr="Показатели по месяцам"/>
+			<menuItem viewId="LabItemOnRatePeriodRep_View" descr="Показатели по периодам норм"/>
+			<menuItem viewId="LabAvgValsReport_View" descr="Средние показатели по дням"/>			
+		</menuItem>
+		<menuItem descr="Склад">
+			<menuItem viewId="RawMaterialProcurementMatDateList_View" descr="Журнал поступлений"/>
+			<menuItem viewId="RawMaterialConsumptionMatDateList_View" descr="Журнал расхода"/>
+			<menuItem viewId="MatTotalList_View" descr="Общая таблица"/>
+			<menuItem viewId="RawMaterial_View" descr="Сырье"/>
+			<menuItem viewId="RawMaterialConsRateDateList_View" descr="Нормы расхода"/>
+			<menuItem viewId="RawMaterialProcurUpload_View" descr="Лог загрузки поступлений"/>
+			<menuItem viewId="MatConsCorrect_View" descr="Корректировка расхода"/>
+			<menuItem viewId="SupplierOrderList_View" descr="Заявки на поставку"/>
+		</menuItem>
+		<menuItem descr="Разное">
+			<menuItem viewId="EmployeeWorkTimeScheduleList_View" descr="Табель рабочего времени"/>
+			<menuItem viewId="ShipmentRep_View" descr="Отгрузка отчет"/>
+			<menuItem viewId="ClientDuplicateList_View" descr="Контрагенты (повторы)"/>
+			<menuItem viewId="ClientValidDuplicateList_View" descr="Контрагенты (разрешенные повторы)"/>
+			
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="Quarry_View" descr="Карьеры"/>
+			<menuItem viewId="Employee_View" descr="Сотрудники"/>
+			<menuItem viewId="ClientList_View" descr="Контрагенты"/>
+			<menuItem viewId="DestinationList_View" descr="Объекты"/>
+			<menuItem viewId="ConcreteType_View" descr="Марки бетона"/>
+			<menuItem viewId="Vehicle_View" descr="Автомобили"/>
+			<menuItem viewId="PumpVehicle_View" descr="Насосы"/>
+			<menuItem viewId="Driver_View" descr="Водители"/>
+			<menuItem viewId="ClientType_View" descr="Виды контрагентов"/>
+			<menuItem viewId="ClientComeFrom_View" descr="Источники обращения"/>			
+			<menuItem viewId="SupplierList_View" descr="Поставщики"/>
+			<menuItem viewId="PumpPrice_View" descr="Ценовые схемы насосов"/>
+			<menuItem viewId="ShipmentTimeNorm_View" descr="Нормы времени отгрузки"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>		
+	</mainMenu>
+	
+	<mainMenu roleId="manager">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="OrderList_View" descr="Журнал заявок"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="OrderFromClientList_View" descr="Заявки от клиентов"/>
+			<menuItem viewId="SpecialistRequestList_View" descr="Вызовы специалиста"/>
+			<menuItem viewId="SiteFeedBackList_View" descr="Обратная связь с сайта"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+			<menuItem viewId="ShipmentPumpList_View" descr="Журнал насосы"/>			
+			<menuItem viewId="AstCall_View" descr="Звонки"/>			
+		</menuItem>	
+		<menuItem descr="Доставка и прокачка">		
+			<menuItem viewId="Map_View" descr="ТС на карте"/>
+			<menuItem viewId="RouteToDestAvgTimeRep_View" descr="Среднее время до объктов"/>
+		</menuItem>
+		<menuItem descr="Разное">
+			<menuItem viewId="ClientDuplicateList_View" descr="Контрагенты (повторы)"/>
+			<menuItem viewId="ClientValidDuplicateList_View" descr="Контрагенты (разрешенные повторы)"/>
+			
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="ClientList_View" descr="Контрагенты"/>
+			<menuItem viewId="DestinationList_View" descr="Объекты"/>
+			<menuItem viewId="Vehicle_View" descr="Автомобили"/>
+			<menuItem viewId="PumpVehicle_View" descr="Насосы"/>
+			<menuItem viewId="Driver_View" descr="Водители"/>
+			<menuItem viewId="ClientType_View" descr="Виды контрагентов"/>
+			<menuItem viewId="ClientComeFrom_View" descr="Источники обращения"/>			
+			<menuItem viewId="PumpPrice_View" descr="Ценовые схемы насосов"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+			<menuItem viewId="SMSPatternList_View" descr="Шаблоны SMS"/>
+		</menuItem>
+	</mainMenu>
+	<mainMenu roleId="supplies">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="OrderList_View" descr="Журнал заявок"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+			<menuItem viewId="ShipmentPumpList_View" descr="Журнал насосы"/>			
+		</menuItem>	
+		<menuItem descr="Склад">
+			<menuItem viewId="RawMaterialProcurementMatDateList_View" descr="Журнал поступлений"/>
+			<menuItem viewId="RawMaterialConsumptionMatDateList_View" descr="Журнал расхода"/>
+			<menuItem viewId="MatTotalList_View" descr="Общая таблица"/>
+			<menuItem viewId="RawMaterial_View" descr="Сырье"/>
+			<menuItem viewId="RawMaterialConsRateDateList_View" descr="Нормы расхода"/>
+			<menuItem viewId="RawMaterialProcurUpload_View" descr="Лог загрузки поступлений"/>
+			<menuItem viewId="MatConsCorrect_View" descr="Корректировка расхода"/>
+			<menuItem viewId="SupplierOrderList_View" descr="Заявки на поставку"/>
+		</menuItem>
+		<menuItem descr="Разное">
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="Quarry_View" descr="Карьеры"/>
+			<menuItem viewId="Employee_View" descr="Сотрудники"/>
+			<menuItem viewId="ConcreteType_View" descr="Марки бетона"/>
+			<menuItem viewId="SupplierList_View" descr="Поставщики"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>				
+	</mainMenu>
+	
+	<mainMenu roleId="sales">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="OrderList_View" descr="Журнал заявок"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="OrderFromClientList_View" descr="Заявки от клиентов"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+			<menuItem viewId="ShipmentPumpList_View" descr="Журнал насосы"/>			
+			<menuItem viewId="AstCall_View" descr="Звонки"/>			
+		</menuItem>	
+		<menuItem descr="Доставка и прокачка">		
+			<menuItem viewId="Map_View" descr="ТС на карте"/>
+			<menuItem viewId="VehicleStopsReport_View" descr="Стоянки на объекте"/>
+			<menuItem viewId="RouteToDestAvgTimeRep_View" descr="Среднее время до объктов"/>
+			<menuItem viewId="VehicleEfficiency_View" descr="Отчет работы миксеров (эффективность)"/>
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="DestinationList_View" descr="Объекты"/>
+		</menuItem>								
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>				
+	</mainMenu>
+	
+	<mainMenu roleId="plant_director">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="ShipmentOperator_View" descr="Отгрузки (оператор)"/>
+		</menuItem>	
+		<menuItem descr="Склад">
+			<menuItem viewId="RawMaterialProcurementMatDateList_View" descr="Журнал поступлений"/>
+			<menuItem viewId="RawMaterialConsumptionMatDateList_View" descr="Журнал расхода"/>
+			<menuItem viewId="SupplierOrderList_View" descr="Заявки на поставку"/>
+		</menuItem>
+		<menuItem descr="Разное">
+			<menuItem viewId="EmployeeWorkTimeScheduleList_View" descr="Табель рабочего времени"/>
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="Employee_View" descr="Сотрудники"/>
+			<menuItem viewId="ConcreteType_View" descr="Марки бетона"/>
+			<menuItem viewId="Vehicle_View" descr="Автомобили"/>
+			<menuItem viewId="PumpVehicle_View" descr="Насосы"/>
+			<menuItem viewId="Driver_View" descr="Водители"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>				
+	</mainMenu>
+	
+	<mainMenu roleId="dispatcher">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="ShipmentOperator_View" descr="Отгрузки (оператор)"/>
+			<menuItem viewId="OrderList_View" descr="Журнал заявок"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+			<menuItem viewId="ShipmentPumpList_View" descr="Журнал насосы"/>			
+		</menuItem>	
+		<menuItem descr="Доставка и прокачка">		
+			<menuItem viewId="Map_View" descr="ТС на карте"/>
+			<menuItem viewId="VehicleStopsReport_View" descr="Стоянки на объекте"/>
+			<menuItem viewId="VehicleScheduleList_View" descr="Графики работы"/>
+			<menuItem viewId="ScheduleGen_View" descr="Формирование графиков"/>
+			<menuItem viewId="VehicleScheduleReportAll_View" descr="Печать графика"/>
+			<menuItem viewId="DriverCheatReport_View" descr="Повторные поездки по самовывозу"/>
+			<menuItem viewId="RouteToDestAvgTimeRep_View" descr="Среднее время до объктов"/>
+			<menuItem viewId="VehicleEfficiency_View" descr="Отчет работы миксеров (эффективность)"/>
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="Employee_View" descr="Сотрудники"/>
+			<menuItem viewId="ClientList_View" descr="Контрагенты"/>
+			<menuItem viewId="DestinationList_View" descr="Объекты"/>
+			<menuItem viewId="ConcreteType_View" descr="Марки бетона"/>
+			<menuItem viewId="Vehicle_View" descr="Автомобили"/>
+			<menuItem viewId="PumpVehicle_View" descr="Насосы"/>
+			<menuItem viewId="Driver_View" descr="Водители"/>
+			<menuItem viewId="SupplierList_View" descr="Поставщики"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>				
+	</mainMenu>
+	<mainMenu roleId="operator">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="ShipmentOperator_View" descr="Отгрузки (оператор)"/>
+			<menuItem viewId="OrderList_View" descr="Журнал заявок"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+			<menuItem viewId="ShipmentPumpList_View" descr="Журнал насосы"/>			
+		</menuItem>	
+		<menuItem descr="Доставка и прокачка">		
+			<menuItem viewId="Map_View" descr="ТС на карте"/>
+			<menuItem viewId="VehicleStopsReport_View" descr="Стоянки на объекте"/>
+			<menuItem viewId="VehicleScheduleList_View" descr="Графики работы"/>
+			<menuItem viewId="ScheduleGen_View" descr="Формирование графиков"/>
+			<menuItem viewId="VehicleScheduleReportAll_View" descr="Печать графика"/>
+			<menuItem viewId="DriverCheatReport_View" descr="Повторные поездки по самовывозу"/>
+			<menuItem viewId="RouteToDestAvgTimeRep_View" descr="Среднее время до объктов"/>
+			<menuItem viewId="VehicleEfficiency_View" descr="Отчет работы миксеров (эффективность)"/>
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="Employee_View" descr="Сотрудники"/>
+			<menuItem viewId="ClientList_View" descr="Контрагенты"/>
+			<menuItem viewId="DestinationList_View" descr="Объекты"/>
+			<menuItem viewId="ConcreteType_View" descr="Марки бетона"/>
+			<menuItem viewId="Vehicle_View" descr="Автомобили"/>
+			<menuItem viewId="PumpVehicle_View" descr="Насосы"/>
+			<menuItem viewId="Driver_View" descr="Водители"/>
+			<menuItem viewId="SupplierList_View" descr="Поставщики"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>				
+	</mainMenu>
+	
+	<mainMenu roleId="lab_worker">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="LabMain_View" descr="Основное окно" default="TRUE"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+		</menuItem>	
+		<menuItem descr="Лаборатория">
+			<menuItem viewId="SandQuarryVal_View" descr="Журнал песок"/>
+			<menuItem viewId="StoneQuarryVal_View" descr="Журнал щебень"/>		
+			<menuItem viewId="LabEntryList_View" descr="Журнал испытания образцов"/>
+			<menuItem viewId="LabEntryRep_View" descr="Отчет лаборанта"/>
+			<menuItem viewId="LabItemRep_View" descr="Показатели по месяцам"/>
+			<menuItem viewId="LabItemOnRatePeriodRep_View" descr="Показатели по периодам норм"/>
+			<menuItem viewId="LabAvgValsReport_View" descr="Средние показатели по дням"/>			
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="Quarry_View" descr="Карьеры"/>
+			<menuItem viewId="ConcreteType_View" descr="Марки бетона"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>
+	</mainMenu>
+
+	<mainMenu roleId="supervisor">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="SpecialistRequestList_View" descr="Вызовы специалиста"/>
+		</menuItem>	
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>
+	</mainMenu>
+</metadata>

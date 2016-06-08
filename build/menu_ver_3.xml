@@ -1,0 +1,80 @@
+	<enum id="role_types">
+		<value id="owner" descr="Администратор"/>
+		<value id="boss" descr="Руководитель"/>
+		<value id="operator" descr="Оператор"/>
+		<value id="manager" descr="Менеджер"/>
+		<value id="dispatcher" descr="Диспетчер"/>
+		<value id="accountant" descr="Бухгалтер"/>
+		<value id="lab_worker" descr="Лаборант"/>
+		<value id="supplies" descr="Снабжение"/>
+		<value id="sales" descr="Реализация"/>
+		<value id="plant_director" descr="Нач.базы"/>
+		<value id="supervisor" descr="Смотрящий"/>
+	</enum>
+
+	<mainMenu roleId="owner">	
+		<menuItem viewId="dashboard" descr="Рабочий стол"/>
+		<menuItem descr="Управление клиентами">
+			<menuItem viewId="client/calls" descr="Звонки"/>
+			<menuItem viewId="client/mail" descr="Почта"/>
+			<menuItem viewId="client/contacts" descr="Контакты"/>
+			<menuItem viewId="client/contractor" descr="Контрагенты"/>
+			<menuItem viewId="client/distribution" descr="Рассылки"/>
+		</menuItem>
+		<menuItem descr="Управление отгрузками">
+			<menuItem viewId="bids" descr="Заявки">
+				<menuItem viewId="bids/active" descr="Текущие заявки"/>
+				<menuItem viewId="bids/journal" descr="Журнал заявок"/>
+			</menuItem>
+			<menuItem viewId="shipments" descr="Отгрузки"/>
+			<menuItem viewId="shipments/trips" descr="Рейсы"/>
+			<menuItem viewId="shipments/reports" descr="Отчеты"/>
+		</menuItem>
+		<menuItem descr="Транспорт">
+			<menuItem viewId="vehicles" descr="Транспортные средства">
+				<menuItem viewId="vehicles/mixers" descr="Автобетоносмесители"/>
+				<menuItem viewId="vehicles/belts" descr="Транспортерные ленты"/>
+				<menuItem viewId="vehicles/pumps" descr="Автобетононасосы"/>
+			</menuItem>
+			<menuItem viewId="vehicles/drivers" descr="Водители"/>
+			<menuItem viewId="vehicles/schedule" descr="График работы"/>
+			<menuItem viewId="vehicles/timesheet" descr="Табель рабочего времени"/>
+			<menuItem viewId="vehicles/reports" descr="Отчеты"/>
+		</menuItem>
+		<menuItem descr="Сотрудники">
+			<menuItem viewId="employees" descr="Список сотрудников"/>
+			<menuItem viewId="employees/schedule" descr="График работы"/>
+			<menuItem viewId="employees/absences" descr="График отсутствий"/>
+			<menuItem viewId="employees/reports" descr="Отчеты"/>
+		</menuItem>
+		<menuItem descr="Лаборатория">
+			<menuItem viewId="lab/input-control" descr="Входной контроль качества"/>
+			<menuItem viewId="lab/samples-test" descr="Испытание образцов"/>
+		</menuItem>
+		<menuItem descr="Склад">
+			<menuItem viewId="storage" descr="Общая таблица"/>
+			<menuItem viewId="storage/income" descr="Поступления"/>
+			<menuItem viewId="storage/expenses" descr="Расход"/>
+			<menuItem viewId="storage/raw" descr="Сырье"/>
+			<menuItem viewId="storage/supply-requests" descr="Заявки на поставку"/>
+			<menuItem viewId="storage/expenses-adjustment" descr="Корректировка расхода"/>
+		</menuItem>
+		<menuItem descr="Настройки">
+			<menuItem viewId="settings/objects" descr="Объекты"/>
+			<menuItem viewId="settings/pricing-schemes" descr="Схемы ценообразования">
+				<menuItem viewId="settings/pricing-schemes/belts" descr="Транспортные ленты"/>
+				<menuItem viewId="settings/pricing-schemes/pumps" descr="Автобетононасосы"/>
+				<menuItem viewId="settings/pricing-schemes/mixers" descr="Автобетоносмесители"/>
+			</menuItem>
+			<menuItem viewId="settings/concrete-marks" descr="Марки бетона"/>
+			<menuItem viewId="settings/clients-management" descr="Управление клиентами">
+				<menuItem viewId="settings/contractor-types" descr="Виды контрагентов"/>
+				<menuItem viewId="settings/request-sources" descr="Источники обращений"/>
+			</menuItem>
+			<menuItem viewId="settings/suppliers" descr="Поставщики"/>
+			<menuItem viewId="settings/telephony" descr="Телефония"/>
+			<menuItem viewId="settings/sms-templates" descr="Шаблоны SMS сообщений"/>
+			<menuItem viewId="settings/constants" descr="Константы"/>
+			<menuItem viewId="settings/expenses-norms" descr="Нормы расходов"/>
+		</menuItem>
+	</mainMenu>	

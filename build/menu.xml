@@ -1,0 +1,383 @@
+		<enum id="role_types">
+			<value id="owner" descr="Администратор"/>
+			<value id="boss" descr="Руководитель"/>
+			<value id="operator" descr="Оператор"/>
+			<value id="manager" descr="Менеджер"/>
+			<value id="dispatcher" descr="Диспетчер"/>
+			<value id="accountant" descr="Бухгалтер"/>
+			<value id="lab_worker" descr="Лаборант"/>
+			<value id="supplies" descr="Снабжение"/>
+			<value id="sales" descr="Реализация"/>
+			<value id="plant_director" descr="Нач.базы"/>
+			<value id="supervisor" descr="Смотрящий"/>
+		</enum>
+
+	<mainMenu roleId="owner">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="ShipmentOperator_View" descr="Отгрузки (оператор)"/>
+			<menuItem viewId="OrderList_View" descr="Журнал заявок"/>			
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="ShipmentTimeList_View" descr="Опоздания назначений и отгрузок"/>
+			<menuItem viewId="OrderFromClientList_View" descr="Заявки от клиентов"/>
+			<menuItem viewId="SpecialistRequestList_View" descr="Вызовы специалиста"/>
+			<menuItem viewId="SiteFeedBackList_View" descr="Обратная связь с сайта"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+			<menuItem viewId="ShipmentPumpList_View" descr="Журнал насосы"/>			
+			<menuItem viewId="AstCall_View" descr="Звонки"/>			
+		</menuItem>	
+		<menuItem descr="Доставка и прокачка">		
+			<menuItem viewId="Map_View" descr="ТС на карте"/>
+			<menuItem viewId="VehicleStopsReport_View" descr="Стоянки на объекте"/>
+			<menuItem viewId="VehicleScheduleList_View" descr="Графики работы"/>
+			<menuItem viewId="ScheduleGen_View" descr="Формирование графиков"/>
+			<menuItem viewId="VehicleScheduleReportAll_View" descr="Печать графика"/>
+			<menuItem viewId="DriverCheatReport_View" descr="Повторные поездки по самовывозу"/>
+			<menuItem viewId="RouteToDestAvgTimeRep_View" descr="Среднее время до объктов"/>
+			<menuItem viewId="VehicleEfficiency_View" descr="Отчет работы миксеров (эффективность)"/>
+		</menuItem>
+		<menuItem descr="Лаборатория">
+			<menuItem viewId="SandQuarryVal_View" descr="Журнал песок"/>
+			<menuItem viewId="StoneQuarryVal_View" descr="Журнал щебень"/>		
+			<menuItem viewId="LabEntryList_View" descr="Журнал испытания образцов"/>
+			<menuItem viewId="LabEntryRep_View" descr="Отчет лаборанта"/>
+			<menuItem viewId="LabItemRep_View" descr="Показатели по месяцам"/>
+			<menuItem viewId="LabItemOnRatePeriodRep_View" descr="Показатели по периодам норм"/>
+			<menuItem viewId="LabAvgValsReport_View" descr="Средние показатели по дням"/>			
+		</menuItem>
+		<menuItem descr="Склад">
+			<menuItem viewId="RawMaterialProcurementMatDateList_View" descr="Журнал поступлений"/>
+			<menuItem viewId="RawMaterialConsumptionMatDateList_View" descr="Журнал расхода"/>
+			<menuItem viewId="MatTotalList_View" descr="Общая таблица"/>
+			<menuItem viewId="RawMaterial_View" descr="Сырье"/>
+			<menuItem viewId="RawMaterialConsRateDateList_View" descr="Нормы расхода"/>
+			<menuItem viewId="RawMaterialProcurUpload_View" descr="Лог загрузки поступлений"/>
+			<menuItem viewId="MatConsCorrect_View" descr="Корректировка расхода"/>
+			<menuItem viewId="SupplierOrderList_View" descr="Заявки на поставку"/>
+		</menuItem>
+		<menuItem descr="Разное">
+			<menuItem viewId="EmployeeWorkTimeScheduleList_View" descr="Табель рабочего времени"/>
+			<menuItem viewId="ShipmentRep_View" descr="Отгрузка отчет"/>
+			<menuItem viewId="AstCallReport_View" descr="Звонки"/>
+			<menuItem viewId="ClientDuplicateList_View" descr="Контрагенты (повторы)"/>
+			<menuItem viewId="ClientValidDuplicateList_View" descr="Контрагенты (разрешенные повторы)"/>
+			
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="Quarry_View" descr="Карьеры"/>
+			<menuItem viewId="Employee_View" descr="Сотрудники"/>
+			<menuItem viewId="ClientList_View" descr="Контрагенты"/>
+			<menuItem viewId="DestinationList_View" descr="Объекты"/>
+			<menuItem viewId="ConcreteType_View" descr="Марки бетона"/>
+			<menuItem viewId="Vehicle_View" descr="Автомобили"/>
+			<menuItem viewId="PumpVehicle_View" descr="Насосы"/>
+			<menuItem viewId="Driver_View" descr="Водители"/>
+			<menuItem viewId="ClientType_View" descr="Виды контрагентов"/>
+			<menuItem viewId="ClientComeFrom_View" descr="Источники обращения"/>			
+			<menuItem viewId="SupplierList_View" descr="Поставщики"/>
+			<menuItem viewId="PumpPrice_View" descr="Ценовые схемы насосов"/>
+			<menuItem viewId="ShipmentTimeNorm_View" descr="Нормы времени отгрузки"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserList_View" descr="Пользователи"/>
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+			<menuItem viewId="ConstantList_View" descr="Константы"/>					
+			<menuItem viewId="UserMacAddressList_View" descr="MAC адреса"/>			
+			<menuItem viewId="SMSPatternList_View" descr="Шаблоны SMS"/>
+		</menuItem>
+	</mainMenu>
+	
+	<mainMenu roleId="boss">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="ShipmentOperator_View" descr="Отгрузки (оператор)"/>
+			<menuItem viewId="OrderList_View" descr="Журнал заявок"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="ShipmentTimeList_View" descr="Опоздания назначений и отгрузок"/>
+			<menuItem viewId="OrderFromClientList_View" descr="Заявки от клиентов"/>
+			<menuItem viewId="SpecialistRequestList_View" descr="Вызовы специалиста"/>
+			<menuItem viewId="SiteFeedBackList_View" descr="Обратная связь с сайта"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+			<menuItem viewId="ShipmentPumpList_View" descr="Журнал насосы"/>			
+			<menuItem viewId="AstCall_View" descr="Звонки"/>			
+		</menuItem>	
+		<menuItem descr="Доставка и прокачка">		
+			<menuItem viewId="Map_View" descr="ТС на карте"/>
+			<menuItem viewId="VehicleStopsReport_View" descr="Стоянки на объекте"/>
+			<menuItem viewId="VehicleScheduleList_View" descr="Графики работы"/>
+			<menuItem viewId="ScheduleGen_View" descr="Формирование графиков"/>
+			<menuItem viewId="VehicleScheduleReportAll_View" descr="Печать графика"/>
+			<menuItem viewId="DriverCheatReport_View" descr="Повторные поездки по самовывозу"/>
+			<menuItem viewId="RouteToDestAvgTimeRep_View" descr="Среднее время до объктов"/>
+			<menuItem viewId="VehicleEfficiency_View" descr="Отчет работы миксеров (эффективность)"/>
+		</menuItem>
+		<menuItem descr="Лаборатория">
+			<menuItem viewId="SandQuarryVal_View" descr="Журнал песок"/>
+			<menuItem viewId="StoneQuarryVal_View" descr="Журнал щебень"/>		
+			<menuItem viewId="LabEntryList_View" descr="Журнал испытания образцов"/>
+			<menuItem viewId="LabEntryRep_View" descr="Отчет лаборанта"/>
+			<menuItem viewId="LabItemRep_View" descr="Показатели по месяцам"/>
+			<menuItem viewId="LabItemOnRatePeriodRep_View" descr="Показатели по периодам норм"/>
+			<menuItem viewId="LabAvgValsReport_View" descr="Средние показатели по дням"/>			
+		</menuItem>
+		<menuItem descr="Склад">
+			<menuItem viewId="RawMaterialProcurementMatDateList_View" descr="Журнал поступлений"/>
+			<menuItem viewId="RawMaterialConsumptionMatDateList_View" descr="Журнал расхода"/>
+			<menuItem viewId="MatTotalList_View" descr="Общая таблица"/>
+			<menuItem viewId="RawMaterial_View" descr="Сырье"/>
+			<menuItem viewId="RawMaterialConsRateDateList_View" descr="Нормы расхода"/>
+			<menuItem viewId="RawMaterialProcurUpload_View" descr="Лог загрузки поступлений"/>
+			<menuItem viewId="MatConsCorrect_View" descr="Корректировка расхода"/>
+			<menuItem viewId="SupplierOrderList_View" descr="Заявки на поставку"/>
+		</menuItem>
+		<menuItem descr="Разное">
+			<menuItem viewId="EmployeeWorkTimeScheduleList_View" descr="Табель рабочего времени"/>
+			<menuItem viewId="ShipmentRep_View" descr="Отгрузка отчет"/>
+			<menuItem viewId="ClientDuplicateList_View" descr="Контрагенты (повторы)"/>
+			<menuItem viewId="ClientValidDuplicateList_View" descr="Контрагенты (разрешенные повторы)"/>
+			
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="Quarry_View" descr="Карьеры"/>
+			<menuItem viewId="Employee_View" descr="Сотрудники"/>
+			<menuItem viewId="ClientList_View" descr="Контрагенты"/>
+			<menuItem viewId="DestinationList_View" descr="Объекты"/>
+			<menuItem viewId="ConcreteType_View" descr="Марки бетона"/>
+			<menuItem viewId="Vehicle_View" descr="Автомобили"/>
+			<menuItem viewId="PumpVehicle_View" descr="Насосы"/>
+			<menuItem viewId="Driver_View" descr="Водители"/>
+			<menuItem viewId="ClientType_View" descr="Виды контрагентов"/>
+			<menuItem viewId="ClientComeFrom_View" descr="Источники обращения"/>			
+			<menuItem viewId="SupplierList_View" descr="Поставщики"/>
+			<menuItem viewId="PumpPrice_View" descr="Ценовые схемы насосов"/>
+			<menuItem viewId="ShipmentTimeNorm_View" descr="Нормы времени отгрузки"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>		
+	</mainMenu>
+	
+	<mainMenu roleId="manager">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="OrderList_View" descr="Журнал заявок"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="OrderFromClientList_View" descr="Заявки от клиентов"/>
+			<menuItem viewId="SpecialistRequestList_View" descr="Вызовы специалиста"/>
+			<menuItem viewId="SiteFeedBackList_View" descr="Обратная связь с сайта"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+			<menuItem viewId="ShipmentPumpList_View" descr="Журнал насосы"/>			
+			<menuItem viewId="AstCall_View" descr="Звонки"/>			
+		</menuItem>	
+		<menuItem descr="Доставка и прокачка">		
+			<menuItem viewId="Map_View" descr="ТС на карте"/>
+			<menuItem viewId="RouteToDestAvgTimeRep_View" descr="Среднее время до объктов"/>
+		</menuItem>
+		<menuItem descr="Разное">
+			<menuItem viewId="ClientDuplicateList_View" descr="Контрагенты (повторы)"/>
+			<menuItem viewId="ClientValidDuplicateList_View" descr="Контрагенты (разрешенные повторы)"/>
+			
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="ClientList_View" descr="Контрагенты"/>
+			<menuItem viewId="DestinationList_View" descr="Объекты"/>
+			<menuItem viewId="Vehicle_View" descr="Автомобили"/>
+			<menuItem viewId="PumpVehicle_View" descr="Насосы"/>
+			<menuItem viewId="Driver_View" descr="Водители"/>
+			<menuItem viewId="ClientType_View" descr="Виды контрагентов"/>
+			<menuItem viewId="ClientComeFrom_View" descr="Источники обращения"/>			
+			<menuItem viewId="PumpPrice_View" descr="Ценовые схемы насосов"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+			<menuItem viewId="SMSPatternList_View" descr="Шаблоны SMS"/>
+		</menuItem>
+	</mainMenu>
+	<mainMenu roleId="supplies">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="OrderList_View" descr="Журнал заявок"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+			<menuItem viewId="ShipmentPumpList_View" descr="Журнал насосы"/>			
+		</menuItem>	
+		<menuItem descr="Склад">
+			<menuItem viewId="RawMaterialProcurementMatDateList_View" descr="Журнал поступлений"/>
+			<menuItem viewId="RawMaterialConsumptionMatDateList_View" descr="Журнал расхода"/>
+			<menuItem viewId="MatTotalList_View" descr="Общая таблица"/>
+			<menuItem viewId="RawMaterial_View" descr="Сырье"/>
+			<menuItem viewId="RawMaterialConsRateDateList_View" descr="Нормы расхода"/>
+			<menuItem viewId="RawMaterialProcurUpload_View" descr="Лог загрузки поступлений"/>
+			<menuItem viewId="MatConsCorrect_View" descr="Корректировка расхода"/>
+			<menuItem viewId="SupplierOrderList_View" descr="Заявки на поставку"/>
+		</menuItem>
+		<menuItem descr="Разное">
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="Quarry_View" descr="Карьеры"/>
+			<menuItem viewId="Employee_View" descr="Сотрудники"/>
+			<menuItem viewId="ConcreteType_View" descr="Марки бетона"/>
+			<menuItem viewId="SupplierList_View" descr="Поставщики"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>				
+	</mainMenu>
+	
+	<mainMenu roleId="sales">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="OrderList_View" descr="Журнал заявок"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="OrderFromClientList_View" descr="Заявки от клиентов"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+			<menuItem viewId="ShipmentPumpList_View" descr="Журнал насосы"/>			
+			<menuItem viewId="AstCall_View" descr="Звонки"/>			
+		</menuItem>	
+		<menuItem descr="Доставка и прокачка">		
+			<menuItem viewId="Map_View" descr="ТС на карте"/>
+			<menuItem viewId="VehicleStopsReport_View" descr="Стоянки на объекте"/>
+			<menuItem viewId="RouteToDestAvgTimeRep_View" descr="Среднее время до объктов"/>
+			<menuItem viewId="VehicleEfficiency_View" descr="Отчет работы миксеров (эффективность)"/>
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="DestinationList_View" descr="Объекты"/>
+		</menuItem>								
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>				
+	</mainMenu>
+	
+	<mainMenu roleId="plant_director">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="ShipmentOperator_View" descr="Отгрузки (оператор)"/>
+		</menuItem>	
+		<menuItem descr="Склад">
+			<menuItem viewId="RawMaterialProcurementMatDateList_View" descr="Журнал поступлений"/>
+			<menuItem viewId="RawMaterialConsumptionMatDateList_View" descr="Журнал расхода"/>
+			<menuItem viewId="SupplierOrderList_View" descr="Заявки на поставку"/>
+		</menuItem>
+		<menuItem descr="Разное">
+			<menuItem viewId="EmployeeWorkTimeScheduleList_View" descr="Табель рабочего времени"/>
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="Employee_View" descr="Сотрудники"/>
+			<menuItem viewId="ConcreteType_View" descr="Марки бетона"/>
+			<menuItem viewId="Vehicle_View" descr="Автомобили"/>
+			<menuItem viewId="PumpVehicle_View" descr="Насосы"/>
+			<menuItem viewId="Driver_View" descr="Водители"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>				
+	</mainMenu>
+	
+	<mainMenu roleId="dispatcher">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="ShipmentOperator_View" descr="Отгрузки (оператор)"/>
+			<menuItem viewId="OrderList_View" descr="Журнал заявок"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+			<menuItem viewId="ShipmentPumpList_View" descr="Журнал насосы"/>			
+		</menuItem>	
+		<menuItem descr="Доставка и прокачка">		
+			<menuItem viewId="Map_View" descr="ТС на карте"/>
+			<menuItem viewId="VehicleStopsReport_View" descr="Стоянки на объекте"/>
+			<menuItem viewId="VehicleScheduleList_View" descr="Графики работы"/>
+			<menuItem viewId="ScheduleGen_View" descr="Формирование графиков"/>
+			<menuItem viewId="VehicleScheduleReportAll_View" descr="Печать графика"/>
+			<menuItem viewId="DriverCheatReport_View" descr="Повторные поездки по самовывозу"/>
+			<menuItem viewId="RouteToDestAvgTimeRep_View" descr="Среднее время до объктов"/>
+			<menuItem viewId="VehicleEfficiency_View" descr="Отчет работы миксеров (эффективность)"/>
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="Employee_View" descr="Сотрудники"/>
+			<menuItem viewId="ClientList_View" descr="Контрагенты"/>
+			<menuItem viewId="DestinationList_View" descr="Объекты"/>
+			<menuItem viewId="ConcreteType_View" descr="Марки бетона"/>
+			<menuItem viewId="Vehicle_View" descr="Автомобили"/>
+			<menuItem viewId="PumpVehicle_View" descr="Насосы"/>
+			<menuItem viewId="Driver_View" descr="Водители"/>
+			<menuItem viewId="SupplierList_View" descr="Поставщики"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>				
+	</mainMenu>
+	<mainMenu roleId="operator">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="ShipmentOperator_View" descr="Отгрузки (оператор)"/>
+			<menuItem viewId="OrderList_View" descr="Журнал заявок"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+			<menuItem viewId="ShipmentPumpList_View" descr="Журнал насосы"/>			
+		</menuItem>	
+		<menuItem descr="Доставка и прокачка">		
+			<menuItem viewId="Map_View" descr="ТС на карте"/>
+			<menuItem viewId="VehicleStopsReport_View" descr="Стоянки на объекте"/>
+			<menuItem viewId="VehicleScheduleList_View" descr="Графики работы"/>
+			<menuItem viewId="ScheduleGen_View" descr="Формирование графиков"/>
+			<menuItem viewId="VehicleScheduleReportAll_View" descr="Печать графика"/>
+			<menuItem viewId="DriverCheatReport_View" descr="Повторные поездки по самовывозу"/>
+			<menuItem viewId="RouteToDestAvgTimeRep_View" descr="Среднее время до объктов"/>
+			<menuItem viewId="VehicleEfficiency_View" descr="Отчет работы миксеров (эффективность)"/>
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="Employee_View" descr="Сотрудники"/>
+			<menuItem viewId="ClientList_View" descr="Контрагенты"/>
+			<menuItem viewId="DestinationList_View" descr="Объекты"/>
+			<menuItem viewId="ConcreteType_View" descr="Марки бетона"/>
+			<menuItem viewId="Vehicle_View" descr="Автомобили"/>
+			<menuItem viewId="PumpVehicle_View" descr="Насосы"/>
+			<menuItem viewId="Driver_View" descr="Водители"/>
+			<menuItem viewId="SupplierList_View" descr="Поставщики"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>				
+	</mainMenu>
+	
+	<mainMenu roleId="lab_worker">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="LabMain_View" descr="Основное окно" default="TRUE"/>
+			<menuItem viewId="ShipmentList_View" descr="Журнал отгрузки"/>
+			<menuItem viewId="ShipmentDateList_View" descr="Журнал отгрузки (по датам)"/>
+		</menuItem>	
+		<menuItem descr="Лаборатория">
+			<menuItem viewId="SandQuarryVal_View" descr="Журнал песок"/>
+			<menuItem viewId="StoneQuarryVal_View" descr="Журнал щебень"/>		
+			<menuItem viewId="LabEntryList_View" descr="Журнал испытания образцов"/>
+			<menuItem viewId="LabEntryRep_View" descr="Отчет лаборанта"/>
+			<menuItem viewId="LabItemRep_View" descr="Показатели по месяцам"/>
+			<menuItem viewId="LabItemOnRatePeriodRep_View" descr="Показатели по периодам норм"/>
+			<menuItem viewId="LabAvgValsReport_View" descr="Средние показатели по дням"/>			
+		</menuItem>
+		<menuItem descr="Справочники">
+			<menuItem viewId="Quarry_View" descr="Карьеры"/>
+			<menuItem viewId="ConcreteType_View" descr="Марки бетона"/>
+		</menuItem>
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>
+	</mainMenu>
+
+	<mainMenu roleId="supervisor">	
+		<menuItem descr="Заявки и отгрузки">
+			<menuItem viewId="OrderMakeList_View" descr="Заявки онлайн" default="TRUE"/>
+			<menuItem viewId="OrderPumpList_View" descr="Журнал заявок (насосы)"/>
+			<menuItem viewId="SpecialistRequestList_View" descr="Вызовы специалиста"/>
+		</menuItem>	
+		<menuItem descr="Админ и настройки">
+			<menuItem viewId="UserNewPassword_View" descr="Сменить свой пароль"/>
+		</menuItem>
+	</mainMenu>
